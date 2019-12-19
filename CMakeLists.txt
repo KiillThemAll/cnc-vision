@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt5 COMPONENTS Core Quick Qml Multimedia Charts REQUIRED)
 #find_package(ZeroMQ REQUIRED)
+set(OpenCV_DIR /usr/lib/python3/dist-packages)
 find_package(OpenCV REQUIRED)
 
 file(GLOB_RECURSE sources *.cpp *.h)

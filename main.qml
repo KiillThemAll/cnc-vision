@@ -1,6 +1,6 @@
 import QtQuick 2.10
 import QtQuick.Window 2.10
-import QtQuick.Controls 2.12
+import QtQuick.Controls 2.6
 import QtQuick.Layouts 1.12
 import QtMultimedia 5.9
 import io.opencv 1.0
@@ -526,6 +526,8 @@ Window {
     }
 
     Item {
+        property variant scanWindow;
+
         anchors.top: parent.top
         anchors.left: buttonsLayout.right
         anchors.bottom: playerItem.top
@@ -616,6 +618,26 @@ Window {
                 Switch {
                     id: automatorEnableSwitch
                     onCheckedChanged: automator.enabled = checked
+                }
+
+                Text {
+                    color: "#ccc"
+                    font.bold: true
+                    text: "Cut/Engrave:"
+                }
+
+                Switch {
+                    id: cutEngraveSwitch
+                    onCheckedChanged: automator.cutMode = checked
+                }
+
+                Button {
+                    text: "Scan"
+                    onClicked: {
+                            var component = Qt.createComponent("ScanWindow.qml");
+                            scanWindow = component.createObject(root);
+                            scanWindow.show();
+                        }
                 }
 
                 Text {
