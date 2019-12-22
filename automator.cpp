@@ -18,6 +18,8 @@ Automator::Automator(QObject *parent) : QObject(parent)
     m_powerTimer.setSingleShot(true);
 
     m_mcs_b_initial = 0;
+    m_mcs_x_check_state = 0;
+    m_mcs_y_check_state = 0;
 }
 
 bool Automator::working() const
@@ -88,7 +90,13 @@ void Automator::onMcStateChanged(RayReceiver::State s)
     if (!m_working)
         return;
     if (s == RayReceiver::Paused) {
-        QThread::sleep(10);
+        //QThread::sleep(10);
+        if(m_mcs_x_check_state != m_mcs_x && m_mcs_y_check_state != m_mcs_y)
+        {
+           m_mcs_x_check_state = m_mcs_x;
+           m_mcs_y_check_state = m_mcs_y;
+           return;
+        }
         float compensated = compensate(m_lastdz);
         if (compensated > 10) {
             m_message = "No entry in comp table";
@@ -100,6 +108,7 @@ void Automator::onMcStateChanged(RayReceiver::State s)
             if (m_autosendB) {
                 emit sendToMC(correction);
                 emit sendToMC("M24\n");
+                QThread::msleep(100);
             }
         }
     }
