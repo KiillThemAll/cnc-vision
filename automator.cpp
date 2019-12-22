@@ -88,6 +88,7 @@ void Automator::onMcStateChanged(RayReceiver::State s)
     if (!m_working)
         return;
     if (s == RayReceiver::Paused) {
+        QThread::sleep(10);
         float compensated = compensate(m_lastdz);
         if (compensated > 10) {
             m_message = "No entry in comp table";

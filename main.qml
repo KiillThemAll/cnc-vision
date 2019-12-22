@@ -552,17 +552,17 @@ Window {
                 }
 
                 Button {
-                    text: "+0.01"
+                    text: "-0.01"
                     onClicked: {
-                        laserPowerSlider.value += 0.01
+                        laserPowerSlider.value -= 0.01
                         laserPowerSlider.onPressedChanged()
                     }
                 }
 
                 Button {
-                    text: "-0.01"
+                    text: "+0.01"
                     onClicked: {
-                        laserPowerSlider.value -= 0.01
+                        laserPowerSlider.value += 0.01
                         laserPowerSlider.onPressedChanged()
                     }
                 }

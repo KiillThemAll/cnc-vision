@@ -4,6 +4,7 @@
 #include <QObject>
 #include "rayreceiver.h"
 #include <QTimer>
+#include <QThread>
 
 class Automator : public QObject
 {
