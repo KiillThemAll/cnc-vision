@@ -6,6 +6,7 @@ Automator::Automator(QObject *parent) : QObject(parent)
     m_working = false;
     m_enabled = false;
     m_mcConnected = false;
+    m_cameraConnected = false;
     m_lastdzValid = false;
     m_lastCoordsValid = false;
     m_message = "Waiting for pause";
@@ -108,7 +109,8 @@ void Automator::onMcStateChanged(RayReceiver::State s)
                 float targetB = m_mcs_b_initial + compensated;
                 QString correction = QString("G90 G0 B%1\n").arg(targetB);
                 m_message = correction;
-                qDebug() << "Target: " << targetB;
+                emit messageChanged();
+                qDebug() << "Command: " << correction;
                 if (m_autosendB) {
                     emit sendToMC(correction);
                     emit sendToMC("M24\n");
@@ -116,6 +118,17 @@ void Automator::onMcStateChanged(RayReceiver::State s)
             }
             m_compensatorOneShot = true;
         }
+    }
+}
+
+void Automator::onCameraStateChanged(CaptureController::Status s)
+{
+    if (s == CaptureController::Status::EofOrDisconnected)
+        m_cameraConnected = false;
+    if (s == CaptureController::Status::Started)
+    {
+        m_cameraConnected = true;
+        checkWorkingState();
     }
 }
 
@@ -1314,7 +1327,7 @@ float Automator::compensate(float dz) const
 
 void Automator::checkWorkingState()
 {
-    bool working = m_lastdzValid && m_mcConnected && m_lastCoordsValid && m_enabled;
+    bool working = m_lastdzValid && m_mcConnected && m_lastCoordsValid && m_enabled && m_cameraConnected;
     if (working != m_working) {
         m_working = working;
         emit workingChanged();

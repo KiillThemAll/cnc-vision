@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "rayreceiver.h"
+#include "capturecontroller.hpp"
 #include <QTimer>
 #include <QThread>
 
@@ -56,6 +57,7 @@ public slots:
     void onRayConnectionStateChanged(bool connected);
     void onCoordsChanged(float x, float y, float z, float b);
     void onMcStateChanged(RayReceiver::State s);
+    void onCameraStateChanged(CaptureController::Status s);
 
 private:
     void checkWorkingState();
@@ -65,6 +67,7 @@ private:
     bool m_lastCoordsValid;
     bool m_enabled;
     bool m_mcConnected;
+    bool m_cameraConnected;
     float m_mcs_x;
     float m_mcs_y;
     float m_mcs_x_check_state;
