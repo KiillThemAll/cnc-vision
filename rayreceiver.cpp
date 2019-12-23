@@ -66,11 +66,11 @@ void RayReceiver::processPayload(QNetworkDatagram datagram)
     //qDebug() << "x:" << m_payload.mcs_x << "\ty:" << m_payload.mcs_y << "\tz:" << m_payload.mcs_z << "\tb:" << m_payload.mcs_b;
     //qDebug() << "state: " << m_payload.state << "\tplayed:" << m_payload.played << "\ttotal:" << m_payload.total;
 
-    /*if (m_lastState != (State)m_payload.state) {
-        m_lastState = (State)m_payload.state;
-        emit stateChanged(m_lastState);
-    }*/
+    if (m_lastState != (State)m_payload.state && (State)m_payload.state == State::Paused) {
+        QThread::sleep(1);
+    }
 
+    m_lastState = (State)m_payload.state;
     emit stateChanged((State)m_payload.state);
 
     emit coordsChanged(m_payload.mcs_x,
