@@ -20,6 +20,7 @@ Automator::Automator(QObject *parent) : QObject(parent)
     m_mcs_b_initial = 0;
     m_mcs_x_check_state = 0;
     m_mcs_y_check_state = 0;
+    m_compensatorOneShot = false;
 }
 
 bool Automator::working() const
@@ -90,27 +91,30 @@ void Automator::onMcStateChanged(RayReceiver::State s)
     if (!m_working)
         return;
     if (s == RayReceiver::Paused) {
-        //QThread::sleep(1);
         if(m_mcs_x_check_state != m_mcs_x || m_mcs_y_check_state != m_mcs_y)
         {
            m_mcs_x_check_state = m_mcs_x;
            m_mcs_y_check_state = m_mcs_y;
+           m_compensatorOneShot = false;
            return;
         }
-        float compensated = compensate(m_lastdz);
-        if (compensated > 10) {
-            m_message = "No entry in comp table";
-            emit messageChanged();
-        } else {
-            float targetB = m_mcs_b_initial + compensated;
-            QString correction = QString("G90 G0 B%1\n").arg(targetB);
-            m_message = correction;
-            qDebug() << "Target: " << targetB;
-            if (m_autosendB) {
-                //emit sendToMC(correction);
-                //emit sendToMC("M24\n");
-                //QThread::msleep(100);
+
+        if (!m_compensatorOneShot){
+            float compensated = compensate(m_lastdz);
+            if (compensated > 10) {
+                m_message = "No entry in comp table";
+                emit messageChanged();
+            } else {
+                float targetB = m_mcs_b_initial + compensated;
+                QString correction = QString("G90 G0 B%1\n").arg(targetB);
+                m_message = correction;
+                qDebug() << "Target: " << targetB;
+                if (m_autosendB) {
+                    emit sendToMC(correction);
+                    emit sendToMC("M24\n");
+                }
             }
+            m_compensatorOneShot = true;
         }
     }
 }

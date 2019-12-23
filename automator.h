@@ -78,6 +78,7 @@ private:
     float m_minPower;
     float m_lastSentPower;
     QTimer m_powerTimer;
+    bool m_compensatorOneShot;
 };
 
 #endif // AUTOMATOR_H
