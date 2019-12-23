@@ -5,6 +5,7 @@
 #include <QUdpSocket>
 #include <QNetworkDatagram>
 #include <QTimer>
+#include <QThread>
 
 typedef struct {
     float mcs_x;
