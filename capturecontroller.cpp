@@ -166,6 +166,6 @@ void CaptureController::setStatus(CaptureController::Status status)
     if (status == m_status)
         return;
     m_status = status;
-    emit statusChanged();
+    emit statusChanged(status);
 }
 
