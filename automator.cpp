@@ -37,6 +37,7 @@ void Automator::ondzChanged(float dz)
 void Automator::ondzValidChanged(bool valid)
 {
     m_lastdzValid = valid;
+    m_cameraConnected = valid;
     checkWorkingState();
 }
 
@@ -96,40 +97,46 @@ void Automator::onMcStateChanged(RayReceiver::State s)
         {
            m_mcs_x_check_state = m_mcs_x;
            m_mcs_y_check_state = m_mcs_y;
-           m_compensatorOneShot = false;
            return;
         }
 
-        if (!m_compensatorOneShot){
-            float compensated = compensate(m_lastdz);
-            if (compensated > 10) {
-                m_message = "No entry in comp table";
-                emit messageChanged();
-            } else {
-                float targetB = m_mcs_b_initial + compensated;
-                QString correction = QString("G90 G0 B%1\n").arg(targetB);
-                m_message = correction;
-                emit messageChanged();
-                qDebug() << "Command: " << correction;
-                if (m_autosendB) {
-                    emit sendToMC(correction);
-                    emit sendToMC("M24\n");
-                }
-            }
-            m_compensatorOneShot = true;
-        }
+        if (!m_compensatorOneShot)
+            QTimer::singleShot(1000, this, SLOT(compensate()));
     }
+    if (s == RayReceiver::Playing)
+        m_compensatorOneShot = false;
 }
 
 void Automator::onCameraStateChanged(CaptureController::Status s)
 {
-    if (s == CaptureController::Status::EofOrDisconnected)
-        m_cameraConnected = false;
-    if (s == CaptureController::Status::Started)
+    if (s == CaptureController::Status::Stopped)
     {
-        m_cameraConnected = true;
+        m_cameraConnected = false;
         checkWorkingState();
     }
+
+}
+
+void Automator::compensate()
+{
+    if (!m_working)
+        return;
+    float compensated = compensate(m_lastdz);
+    if (compensated > 10) {
+        m_message = "No entry in comp table";
+        emit messageChanged();
+    } else {
+        float targetB = m_mcs_b_initial + compensated;
+        QString correction = QString("G90 G0 B%1\n").arg(targetB);
+        m_message = correction;
+        emit messageChanged();
+        qDebug() << "Command: " << correction;
+        if (m_autosendB) {
+            emit sendToMC(correction);
+            emit sendToMC("M24\n");
+        }
+    }
+    m_compensatorOneShot = true;
 }
 
 float Automator::compensate(float dz) const
