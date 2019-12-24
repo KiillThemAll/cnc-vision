@@ -70,7 +70,7 @@ public slots:
     void start(const QString &device);
     void stop();
 signals:
-    void statusChanged();
+    void statusChanged(Status s);
     void frameReady();
     //void statisticsReady(QVariant ?
 

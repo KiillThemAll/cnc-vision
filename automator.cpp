@@ -6,6 +6,7 @@ Automator::Automator(QObject *parent) : QObject(parent)
     m_working = false;
     m_enabled = false;
     m_mcConnected = false;
+    m_cameraConnected = false;
     m_lastdzValid = false;
     m_lastCoordsValid = false;
     m_message = "Waiting for pause";
@@ -20,6 +21,7 @@ Automator::Automator(QObject *parent) : QObject(parent)
     m_mcs_b_initial = 0;
     m_mcs_x_check_state = 0;
     m_mcs_y_check_state = 0;
+    m_compensatorOneShot = false;
 }
 
 bool Automator::working() const
@@ -90,27 +92,43 @@ void Automator::onMcStateChanged(RayReceiver::State s)
     if (!m_working)
         return;
     if (s == RayReceiver::Paused) {
-        //QThread::sleep(10);
-        if(m_mcs_x_check_state != m_mcs_x && m_mcs_y_check_state != m_mcs_y)
+        if(m_mcs_x_check_state != m_mcs_x || m_mcs_y_check_state != m_mcs_y)
         {
            m_mcs_x_check_state = m_mcs_x;
            m_mcs_y_check_state = m_mcs_y;
+           m_compensatorOneShot = false;
            return;
         }
-        float compensated = compensate(m_lastdz);
-        if (compensated > 10) {
-            m_message = "No entry in comp table";
-            emit messageChanged();
-        } else {
-            float targetB = m_mcs_b_initial + compensated;
-            QString correction = QString("G90 G0 B%1\n").arg(targetB);
-            m_message = correction;
-            if (m_autosendB) {
-                emit sendToMC(correction);
-                emit sendToMC("M24\n");
-                QThread::msleep(100);
+
+        if (!m_compensatorOneShot){
+            float compensated = compensate(m_lastdz);
+            if (compensated > 10) {
+                m_message = "No entry in comp table";
+                emit messageChanged();
+            } else {
+                float targetB = m_mcs_b_initial + compensated;
+                QString correction = QString("G90 G0 B%1\n").arg(targetB);
+                m_message = correction;
+                emit messageChanged();
+                qDebug() << "Command: " << correction;
+                if (m_autosendB) {
+                    emit sendToMC(correction);
+                    emit sendToMC("M24\n");
+                }
             }
+            m_compensatorOneShot = true;
         }
+    }
+}
+
+void Automator::onCameraStateChanged(CaptureController::Status s)
+{
+    if (s == CaptureController::Status::EofOrDisconnected)
+        m_cameraConnected = false;
+    if (s == CaptureController::Status::Started)
+    {
+        m_cameraConnected = true;
+        checkWorkingState();
     }
 }
 
@@ -1426,7 +1444,7 @@ float Automator::compensate(float dz) const
 
 void Automator::checkWorkingState()
 {
-    bool working = m_lastdzValid && m_mcConnected && m_lastCoordsValid && m_enabled;
+    bool working = m_lastdzValid && m_mcConnected && m_lastCoordsValid && m_enabled && m_cameraConnected;
     if (working != m_working) {
         m_working = working;
         emit workingChanged();
