@@ -58,6 +58,7 @@ public slots:
     void onCoordsChanged(float x, float y, float z, float b);
     void onMcStateChanged(RayReceiver::State s);
     void onCameraStateChanged(CaptureController::Status s);
+    void compensate();
 
 private:
     void checkWorkingState();
