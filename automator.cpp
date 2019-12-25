@@ -101,7 +101,10 @@ void Automator::onMcStateChanged(RayReceiver::State s)
         }
 
         if (!m_compensatorOneShot)
+        {
             QTimer::singleShot(1000, this, SLOT(compensate()));
+            m_compensatorOneShot = true;
+        }
     }
     if (s == RayReceiver::Playing)
         m_compensatorOneShot = false;
@@ -136,7 +139,6 @@ void Automator::compensate()
             emit sendToMC("M24\n");
         }
     }
-    m_compensatorOneShot = true;
 }
 
 float Automator::compensate(float dz) const
