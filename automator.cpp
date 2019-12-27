@@ -1475,6 +1475,28 @@ float Automator::lastSentPower() const
     return m_lastSentPower;
 }
 
+void Automator::scanSurface(int width, int height, int step) const
+{
+    QFile scanGCode("scanGCode.ngc");
+    if (scanGCode.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(&scanGCode);
+
+        out << "M220 S100\nM204 S250\nG90 G0 X0 Y0 F10000\n";
+
+        for (int i=0; i<=height/(step*2); i++)
+        {
+            out << QString(" X%1\n").arg(width)
+                << QString(" Y%1\n").arg(step)
+                << QString(" X-%1\n").arg(width);
+        }
+        if (height % (step*2) >= step)
+            out << QString(" X%1\n").arg(width);
+
+        out << "G0 X0 Y0";
+    }
+
+}
+
 float Automator::maxPower() const
 {
     return m_maxPower;

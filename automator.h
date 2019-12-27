@@ -6,6 +6,9 @@
 #include "capturecontroller.hpp"
 #include <QTimer>
 #include <QThread>
+#include <QFile>
+#include <QTextStream>
+
 
 class Automator : public QObject
 {
@@ -42,6 +45,8 @@ public:
     void setMinPower(float minPower);
 
     float lastSentPower() const;
+
+    Q_INVOKABLE void scanSurface(int width, int height, int step) const;
 
 signals:
     void workingChanged();

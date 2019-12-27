@@ -10,6 +10,7 @@ import QtCharts 2.3
 import QtQuick.Dialogs 1.2
 
 Window {
+    id: root
     visible: true
     width: 1920
     height: 1080
@@ -526,7 +527,7 @@ Window {
     }
 
     Item {
-        property variant scanWindow;
+
 
         anchors.top: parent.top
         anchors.left: buttonsLayout.right
@@ -634,9 +635,9 @@ Window {
                 Button {
                     text: "Scan"
                     onClicked: {
-                            var component = Qt.createComponent("ScanWindow.qml");
-                            scanWindow = component.createObject(root);
-                            scanWindow.show();
+                            var component = Qt.createComponent("scan.qml");
+                            component.createObject(root);
+
                         }
                 }
 
