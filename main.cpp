@@ -71,6 +71,12 @@ int main(int argc, char *argv[])
                      &player,       &GcodePlayer::send);
     QObject::connect(&captureController,     &CaptureController::statusChanged,
                      &automator,    &Automator::onCameraStateChanged);
+    QObject::connect(&automator,     &Automator::startScan,
+                     &player,    &GcodePlayer::startFile);
+    QObject::connect(&player,     &GcodePlayer::stateChanged,
+                     &automator,    &Automator::scanSnapshot);
+    QObject::connect(&automator,     &Automator::continueScan,
+                     &player,    &GcodePlayer::sendNextLine);
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

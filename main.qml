@@ -621,17 +621,6 @@ Window {
                     onCheckedChanged: automator.enabled = checked
                 }
 
-                Text {
-                    color: "#ccc"
-                    font.bold: true
-                    text: "Cut/Engrave:"
-                }
-
-                Switch {
-                    id: cutEngraveSwitch
-                    onCheckedChanged: automator.cutMode = checked
-                }
-
                 Button {
                     text: "Scan"
                     onClicked: {
@@ -735,11 +724,11 @@ Window {
                 Text {
                     color: "#ccc"
                     font.bold: true
-                    text: "Auto B:"
+                    text: "AutoEngr/AutoCut:"
                 }
 
                 Switch {
-                    onCheckedChanged: automator.autosendB = checked
+                    onCheckedChanged: automator.cutModeEnabled = checked
                 }
 
                 Text {

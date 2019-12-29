@@ -67,7 +67,7 @@ void GcodePlayer::loadFile(const QUrl &fileUrl)
     m_linesCount = lineNumber - 1;
     emit linesCountChanged();
     m_state = Stopped;
-    emit stateChanged();
+    emit stateChanged(m_state);
 }
 
 int GcodePlayer::currentLineNumber() const
@@ -102,6 +102,12 @@ void GcodePlayer::send(const QString &command)
     }
 }
 
+void GcodePlayer::startFile(const QUrl &fileUrl)
+{
+    loadFile(fileUrl);
+    play();
+}
+
 void GcodePlayer::connectToMC()
 {
     if (m_connectionState == Disconnected) {
@@ -122,14 +128,14 @@ void GcodePlayer::play()
             m_model->changeAllStates(GcodePlayerItem::Pending);
             sendNextLine();
             m_state = Playing;
-            emit stateChanged();
+            emit stateChanged(m_state);
         } else {
             qWarning() << "Nothing to play";
         }
     } else if (m_state == Paused) {
         sendNextLine();
         m_state = Playing;
-        emit stateChanged();
+        emit stateChanged(m_state);
     } else {
         qWarning() << "Can't play from state" << m_state;
     }
@@ -138,13 +144,13 @@ void GcodePlayer::play()
 void GcodePlayer::pause()
 {
     m_state = Paused;
-    emit stateChanged();
+    emit stateChanged(m_state);
 }
 
 void GcodePlayer::stop()
 {
     m_state = Stopped;
-    emit stateChanged();
+    emit stateChanged(m_state);
 }
 
 void GcodePlayer::onSocketStateChanged(QAbstractSocket::SocketState state)
@@ -209,6 +215,14 @@ void GcodePlayer::onMCResponse()
 void GcodePlayer::sendNextLine()
 {
     GcodePlayerItem line = m_model->getItem(m_currentLineNumber - 1);
+    if(line.m_code == "M25\n"){
+        m_state = Paused;
+        emit stateChanged(m_state);
+        GcodePlayerItem item = m_model->getItem(m_currentLineNumber - 1);
+        m_model->replaceItem(m_currentLineNumber - 1, item);
+        m_currentLineNumber++;
+        return;
+    }
     m_tcp->write(line.m_code.toLocal8Bit());
     m_querySent = true;
 }
@@ -231,7 +245,7 @@ void GcodePlayer::processMCResponse(const QString &line)
         m_currentLineNumber++;
         if (m_currentLineNumber > m_linesCount) {
             m_state = Stopped;
-            emit stateChanged();
+            emit stateChanged(m_state);
         } else {
             emit currentLineChanged();
             if (m_state == Playing)

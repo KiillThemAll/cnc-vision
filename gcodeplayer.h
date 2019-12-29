@@ -50,7 +50,7 @@ public:
 signals:
     void currentLineChanged();
     void linesCountChanged();
-    void stateChanged();
+    void stateChanged(State s);
     void connectionStateChanged();
     void connectionStateChanged(bool connected);
 
@@ -61,6 +61,8 @@ public slots:
     void pause();
     void stop();
     void send(const QString &command);
+    void startFile(const QUrl &fileUrl);
+    void sendNextLine();
 
 private slots:
     void onSocketStateChanged(QAbstractSocket::SocketState state);
@@ -68,7 +70,6 @@ private slots:
     void onMCResponse();
 
 private:
-    void sendNextLine();
     void processMCResponse(const QString &line);
 
     GcodePlayerModel *m_model;

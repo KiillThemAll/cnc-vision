@@ -10,7 +10,7 @@ Automator::Automator(QObject *parent) : QObject(parent)
     m_lastdzValid = false;
     m_lastCoordsValid = false;
     m_message = "Waiting for pause";
-    m_autosendB = false;
+    m_cutModeEnabled = false;
     m_autosendPower = false;
     m_minPower = 1.0;
     m_maxPower = 0.8;
@@ -18,10 +18,12 @@ Automator::Automator(QObject *parent) : QObject(parent)
     m_powerTimer.setInterval(1000); // maximum power update rate [ms]
     m_powerTimer.setSingleShot(true);
 
-    m_mcs_b_initial = 0;
     m_mcs_x_check_state = 0;
     m_mcs_y_check_state = 0;
     m_compensatorOneShot = false;
+    m_scanOneShot = false;
+
+    m_surfaceModel = new SurfaceModel(this);
 }
 
 bool Automator::working() const
@@ -122,22 +124,29 @@ void Automator::onCameraStateChanged(CaptureController::Status s)
 
 void Automator::compensate()
 {
-    if (!m_working)
+    if (!m_working || m_cutModeEnabled)
         return;
     float compensated = compensate(m_lastdz);
     if (compensated > 10) {
         m_message = "No entry in comp table";
         emit messageChanged();
     } else {
-        float targetB = m_mcs_b_initial + compensated;
+        float targetB = compensated;
         QString correction = QString("G90 G0 B%1\n").arg(targetB);
         m_message = correction;
         emit messageChanged();
-        qDebug() << "Command: " << correction;
-        if (m_autosendB) {
-            emit sendToMC(correction);
-            emit sendToMC("M24\n");
-        }
+        qDebug() << correction;
+        emit sendToMC(correction);
+        emit sendToMC("M24\n");
+    }
+}
+
+void Automator::scanSnapshot(GcodePlayer::State s)
+{
+    if (!m_scanOneShot && s == GcodePlayer::State::Paused)
+    {
+        QTimer::singleShot(1000, this, SLOT(compensate()));
+        m_scanOneShot = true;
     }
 }
 
@@ -1460,6 +1469,22 @@ void Automator::checkWorkingState()
     }
 }
 
+void Automator::m_scanSnapshot()
+{
+    float compensated = compensate(m_lastdz);
+    if (compensated > 10) {
+        m_message = "No entry in comp table";
+        emit messageChanged();
+        emit continueScan();
+    } else {
+        m_surfaceModel->addPoint(SurfacePoint(m_mcs_x,m_mcs_y,compensated));
+        m_message = QString("Z: %1").arg(compensated);
+        emit messageChanged();
+        qDebug() << m_message;
+        emit continueScan();
+    }
+}
+
 float Automator::minPower() const
 {
     return m_minPower;
@@ -1475,7 +1500,42 @@ float Automator::lastSentPower() const
     return m_lastSentPower;
 }
 
-void Automator::scanSurface(int width, int height, int step) const
+void Automator::scanSurface(int width, int height, int step)
+{
+    QFile scanGCode("scanGCode.ngc");
+    if (scanGCode.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(&scanGCode);
+
+        out << "M220 S100\nM204 S600\nG90 G0 X0 Y0 F15000\nM25\n";
+
+        for (int i=1; i<=height/step; i++)
+        {
+            for (int j=1; j<=width/step; j++)
+                if (i%2)
+                    out << QString("G0 X%1\nM25\n").arg(step*j);
+                else
+                    out << QString("G0 X%1\nM25\n").arg(width-step*j);
+
+            out << QString("G0 Y%1\nM25\n").arg(step*i);
+        }
+
+        out << "G0 X0 Y0";
+    }
+
+    emit startScan(QUrl("file:scanGCode.ngc"));
+}
+
+SurfaceModel *Automator::surfaceModel() const
+{
+    return m_surfaceModel;
+}
+
+void Automator::clearSurface() const
+{
+    m_surfaceModel->removeAll();
+}
+
+/*void Automator::scanSurface(int width, int height, int step) const
 {
     QFile scanGCode("scanGCode.ngc");
     if (scanGCode.open(QFile::WriteOnly | QFile::Truncate)) {
@@ -1495,7 +1555,7 @@ void Automator::scanSurface(int width, int height, int step) const
         out << "G0 X0 Y0";
     }
 
-}
+}*/
 
 float Automator::maxPower() const
 {
@@ -1517,14 +1577,24 @@ void Automator::setAutosendPower(bool autosendPower)
     m_autosendPower = autosendPower;
 }
 
-bool Automator::autosendB() const
+bool Automator::cutModeEnabled() const
 {
-    return m_autosendB;
+    return m_cutModeEnabled;
 }
 
-void Automator::setAutosendB(bool autosendB)
+void Automator::setCutModeEnabled(bool cutMode)
 {
-    m_autosendB = autosendB;
+    m_cutModeEnabled = cutMode;
+}
+
+bool Automator::scanApproved() const
+{
+    return m_scanApproved;
+}
+
+void Automator::setScanApproved(bool scanApproved)
+{
+    m_scanApproved = scanApproved;
 }
 
 bool Automator::enabled() const
