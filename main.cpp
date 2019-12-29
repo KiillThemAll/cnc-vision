@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     QObject::connect(&player,     &GcodePlayer::stateChanged,
                      &automator,    &Automator::scanSnapshot);
     QObject::connect(&automator,     &Automator::continueScan,
-                     &player,    &GcodePlayer::sendNextLine);
+                     &player,    &GcodePlayer::continueFromM25);
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

@@ -62,7 +62,9 @@ public slots:
     void stop();
     void send(const QString &command);
     void startFile(const QUrl &fileUrl);
-    void sendNextLine();
+    void continueFromM25();
+
+
 
 private slots:
     void onSocketStateChanged(QAbstractSocket::SocketState state);
@@ -70,6 +72,7 @@ private slots:
     void onMCResponse();
 
 private:
+    void sendNextLine();
     void processMCResponse(const QString &line);
 
     GcodePlayerModel *m_model;

@@ -7,7 +7,8 @@
 
 struct SurfacePoint
 {
-    SurfacePoint(float inpX, float inpY, float inpZ){x=inpX;y=inpY;z=inpZ;};
+    //SurfacePoint(float inpX, float inpY, float inpZ){x=inpX;y=inpY;z=inpZ;};
+
     float x;
     float y;
     float z;

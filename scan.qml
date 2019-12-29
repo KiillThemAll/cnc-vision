@@ -2,7 +2,7 @@ import QtQuick 2.10
 import QtQuick.Window 2.10
 import QtQuick.Controls 2.6
 import QtQuick.Layouts 1.12
-import QtDataVisualization 1.14
+//import QtDataVisualization 1.14
 
 Window {
     id: scanWindow
@@ -121,7 +121,7 @@ Window {
 
     }
 
-    Item {
+    /*Item {
         id: surfaceView
         width: parent.width
 
@@ -181,6 +181,6 @@ Window {
                 }
             }
         }
-    }
+    }*/
 
 }

@@ -143,10 +143,9 @@ void Automator::compensate()
 
 void Automator::scanSnapshot(GcodePlayer::State s)
 {
-    if (!m_scanOneShot && s == GcodePlayer::State::Paused)
+    if (s == GcodePlayer::State::Paused)
     {
-        QTimer::singleShot(1000, this, SLOT(compensate()));
-        m_scanOneShot = true;
+        QTimer::singleShot(1000, this, SLOT(m_scanSnapshot()));
     }
 }
 
@@ -1477,7 +1476,11 @@ void Automator::m_scanSnapshot()
         emit messageChanged();
         emit continueScan();
     } else {
-        m_surfaceModel->addPoint(SurfacePoint(m_mcs_x,m_mcs_y,compensated));
+        SurfacePoint point;
+        point.x = m_mcs_x;
+        point.y = m_mcs_y;
+        point.z = compensated;
+        m_surfaceModel->addPoint(point);
         m_message = QString("Z: %1").arg(compensated);
         emit messageChanged();
         qDebug() << m_message;

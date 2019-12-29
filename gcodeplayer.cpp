@@ -108,6 +108,13 @@ void GcodePlayer::startFile(const QUrl &fileUrl)
     play();
 }
 
+void GcodePlayer::continueFromM25()
+{
+    sendNextLine();
+    m_state = Playing;
+    emit stateChanged(m_state);
+}
+
 void GcodePlayer::connectToMC()
 {
     if (m_connectionState == Disconnected) {
