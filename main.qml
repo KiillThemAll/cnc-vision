@@ -77,10 +77,15 @@ Window {
                     to: 179
                     stepSize: 1
                     first.value: 0
-                    second.value: 10
+                    second.value: 40
                     first.onMoved: lineDetector.hueLowRangeFrom = Math.floor(first.value)
                     second.onMoved: lineDetector.hueLowRangeTo = Math.floor(second.value)
+                    Component.onCompleted: {
+                        lineDetector.hueLowRangeFrom = Math.floor(first.value);
+                        lineDetector.hueLowRangeTo = Math.floor(second.value);
+                    }
                 }
+
             }
             RowLayout {
                 Layout.maximumHeight: 24
@@ -94,10 +99,14 @@ Window {
                     from: 0
                     to: 179
                     stepSize: 1
-                    first.value: 170
+                    first.value: 140
                     second.value: 179
                     first.onMoved: lineDetector.hueHighRangeFrom = Math.floor(first.value)
                     second.onMoved: lineDetector.hueHighRangeTo = Math.floor(second.value)
+                    Component.onCompleted: {
+                        lineDetector.hueHighRangeFrom = Math.floor(first.value);
+                        lineDetector.hueHighRangeTo = Math.floor(second.value);
+                    }
                 }
             }
             RowLayout {
@@ -112,10 +121,14 @@ Window {
                     from: 0
                     to: 255
                     stepSize: 1
-                    first.value: 40
-                    second.value: 255
+                    first.value: 0
+                    second.value: 160
                     first.onMoved: lineDetector.saturationFrom = Math.floor(first.value)
                     second.onMoved: lineDetector.saturationTo = Math.floor(second.value)
+                    Component.onCompleted: {
+                        lineDetector.saturationFrom = Math.floor(first.value);
+                        lineDetector.saturationTo = Math.floor(second.value);
+                    }
                 }
             }
             RowLayout {
@@ -130,10 +143,14 @@ Window {
                     from: 0
                     to: 255
                     stepSize: 1
-                    first.value: 40
+                    first.value: 225
                     second.value: 255
                     first.onMoved: lineDetector.valueFrom = Math.floor(first.value)
                     second.onMoved: lineDetector.valueTo = Math.floor(second.value)
+                    Component.onCompleted: {
+                        lineDetector.valueFrom = Math.floor(first.value);
+                        lineDetector.valueTo = Math.floor(second.value);
+                    }
                 }
             }
             RowLayout {
@@ -148,10 +165,14 @@ Window {
                     from: 0
                     to: 1
                     stepSize: 0.01
-                    first.value: 0.2
-                    second.value: 0.8
+                    first.value: 0.57
+                    second.value: 0.77
                     first.onMoved: lineDetector.integrateFrom = first.value
                     second.onMoved: lineDetector.integrateTo = second.value
+                    Component.onCompleted: {
+                        lineDetector.integrateFrom = first.value;
+                        lineDetector.integrateTo = second.value;
+                    }
                 }
             }
             RowLayout {
@@ -167,7 +188,11 @@ Window {
                     from: 0
                     to: 1
                     stepSize: 0.01
+                    value: 0.12
                     onValueChanged: lineDetector.threshold = value
+                    Component.onCompleted: {
+                        lineDetector.threshold = value
+                    }
                 }
             }
             RowLayout {
@@ -182,7 +207,12 @@ Window {
                     from: -15
                     to: 15
                     stepSize: 0.1
+                    value: 2
                     onValueChanged: lineDetector.rotation = value
+                    Component.onCompleted: {
+                        lineDetector.rotation = value
+                    }
+
                 }
             }
 
