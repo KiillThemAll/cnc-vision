@@ -32,6 +32,14 @@ void SurfaceModel::addPoint(const SurfacePoint &point)
     endInsertRows();
 }
 
+void SurfaceModel::updatePoints(const QVector<SurfacePoint> &points)
+{
+    removeAll();
+    beginInsertRows(QModelIndex(), 0, m_surface.count());
+    m_surface.append(points);
+    endInsertRows();
+}
+
 QHash<int, QByteArray> SurfaceModel::roleNames() const
 {
     QHash<int, QByteArray> roles;

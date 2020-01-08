@@ -31,6 +31,7 @@ public:
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     void addPoint(const SurfacePoint &point);
+    void updatePoints(const QVector<SurfacePoint> &points);
 
     void removeAll();
 

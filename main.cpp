@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
     RayReceiver receiver;
     engine.rootContext()->setContextProperty("ray", &receiver);
 
+    qmlRegisterType<GcodePlayer>("tech.vhrd.automator", 1, 0, "Automator");
+
     Automator automator;
     engine.rootContext()->setContextProperty("automator", &automator);
     QObject::connect(&lineDetector, QOverload<float>::of(&LineDetector::dzChanged),
@@ -77,6 +79,8 @@ int main(int argc, char *argv[])
                      &automator,    &Automator::scanSnapshot);
     QObject::connect(&automator,     &Automator::continueScan,
                      &player,    &GcodePlayer::continueFromM25);
+    QObject::connect(&player,     &GcodePlayer::stateChanged,
+                     &automator,    &Automator::scanFinished);
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

@@ -13,22 +13,37 @@
 #include "surfacemodel.h"
 #include "gcodeplayer.h"
 
+#include "datatable.h"
+#include "bspline.h"
+#include "bsplinebuilder.h"
+
+
 
 class Automator : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool working READ working NOTIFY workingChanged)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
     Q_PROPERTY(bool cutModeEnabled READ cutModeEnabled WRITE setCutModeEnabled)
-    Q_PROPERTY(bool scanApproved READ scanApproved WRITE setScanApproved)
+    Q_PROPERTY(bool scanComplited READ scanComplited NOTIFY scanStateChanged)
     Q_PROPERTY(QString message READ message NOTIFY messageChanged)
     Q_PROPERTY(bool autosendPower READ autosendPower WRITE setAutosendPower)
     Q_PROPERTY(float minPower READ minPower WRITE setMinPower)
     Q_PROPERTY(float maxPower READ maxPower WRITE setMaxPower)
     Q_PROPERTY(float lastSentPower READ lastSentPower NOTIFY changePower)
     Q_PROPERTY(SurfaceModel *surfaceModel READ surfaceModel CONSTANT)
+    Q_PROPERTY(State state READ state NOTIFY stateChanged);
 public:
     explicit Automator(QObject *parent = nullptr);
+    ~Automator();
+
+    enum State {
+        Disabled,
+        AutoEngraving,
+        AutoCutting,
+        Scanning,
+        Error
+    };
+    Q_ENUM(State)
 
     bool working() const;
 
@@ -41,8 +56,7 @@ public:
     bool cutModeEnabled() const;
     void setCutModeEnabled(bool cutMode);
 
-    bool scanApproved() const;
-    void setScanApproved(bool scanApproved);
+    bool scanComplited() const;
 
     bool autosendPower() const;
     void setAutosendPower(bool autosendPower);
@@ -56,19 +70,23 @@ public:
     float lastSentPower() const;
 
     Q_INVOKABLE void scanSurface(int width, int height, int step);
+    Q_INVOKABLE void approveScan();
 
     SurfaceModel *surfaceModel() const;
 
     Q_INVOKABLE void clearSurface() const;
 
+    State state() const;
+
 signals:
-    void workingChanged();
     void enabledChanged();
     void messageChanged();
     void sendToMC(const QString &command);
     void changePower(float power);
     void startScan(const QUrl &fileUrl);
     void continueScan();
+    void stateChanged(State s);
+    void scanStateChanged();
 
 public slots:
     void ondzChanged(float dz);
@@ -80,6 +98,7 @@ public slots:
     void onCameraStateChanged(CaptureController::Status s);
     void compensate();
     void scanSnapshot(GcodePlayer::State s);
+    void scanFinished(GcodePlayer::State s);
 
 private:
     void checkWorkingState();
@@ -104,8 +123,14 @@ private:
     bool m_compensatorOneShot;
     bool m_scanOneShot;
     bool m_cutModeEnabled;
-    bool m_scanApproved;
+    bool m_scanComplited;
     SurfaceModel *m_surfaceModel;
+    State m_state;
+
+    SPLINTER::DataTable m_samples;
+    SPLINTER::BSpline *m_surfaceSpline;
+    float m_scanWidth;
+    float m_scanHeight;
 
 private slots:
     void m_scanSnapshot();

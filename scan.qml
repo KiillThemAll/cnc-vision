@@ -2,7 +2,7 @@ import QtQuick 2.10
 import QtQuick.Window 2.10
 import QtQuick.Controls 2.6
 import QtQuick.Layouts 1.12
-//import QtDataVisualization 1.14
+import QtDataVisualization 1.2
 
 Window {
     id: scanWindow
@@ -108,8 +108,9 @@ Window {
 
         Button {
             text: "Approve scan"
+            enabled: automator.scanComplited
 
-            onClicked: automator.scanApproved = true
+            onClicked: automator.approveScan()
         }
 
         Button {
@@ -121,7 +122,7 @@ Window {
 
     }
 
-    /*Item {
+    Item {
         id: surfaceView
         width: parent.width
 
@@ -150,7 +151,7 @@ Window {
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeft
             axisX.min: 0.0
-            axisX.max: 1500.0
+            axisX.max: 1525.0
             axisY.min: 0.0
             axisY.max: 1500.0
             axisZ.min: -5
@@ -181,6 +182,6 @@ Window {
                 }
             }
         }
-    }*/
+    }
 
 }

@@ -223,7 +223,7 @@ void GcodePlayer::sendNextLine()
 {
     GcodePlayerItem line = m_model->getItem(m_currentLineNumber - 1);
     if(line.m_code == "M25\n"){
-        m_state = Paused;
+        m_state = PausedM25;
         emit stateChanged(m_state);
         GcodePlayerItem item = m_model->getItem(m_currentLineNumber - 1);
         m_model->replaceItem(m_currentLineNumber - 1, item);

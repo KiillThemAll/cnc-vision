@@ -24,6 +24,17 @@ Automator::Automator(QObject *parent) : QObject(parent)
     m_scanOneShot = false;
 
     m_surfaceModel = new SurfaceModel(this);
+
+    m_state = Disabled;
+
+    m_scanComplited = false;
+
+    m_surfaceSpline = nullptr;
+}
+
+Automator::~Automator()
+{
+    delete m_surfaceSpline;
 }
 
 bool Automator::working() const
@@ -143,9 +154,48 @@ void Automator::compensate()
 
 void Automator::scanSnapshot(GcodePlayer::State s)
 {
-    if (s == GcodePlayer::State::Paused)
+    if (s == GcodePlayer::State::PausedM25)
     {
         QTimer::singleShot(1000, this, SLOT(m_scanSnapshot()));
+    }
+}
+
+void Automator::scanFinished(GcodePlayer::State s)
+{
+    if (s == GcodePlayer::State::Stopped && m_state == Scanning)
+    {
+
+            delete m_surfaceSpline;
+
+            m_surfaceSpline = new SPLINTER::BSpline(SPLINTER::BSpline::Builder(m_samples).degree(3).build());
+
+            QVector<SurfacePoint> points;
+            SurfacePoint point;
+            SPLINTER::DenseVector x(2);
+
+            points.reserve((m_scanWidth+1)*(m_scanHeight+1));
+
+            for(int i = 0; i <= m_scanHeight; i++)
+                {
+                    for(int j = 0; j <= m_scanWidth; j++)
+                    {
+                        x(0) = i;
+                        point.x = i;
+                        x(1) = j;
+                        point.y = j;
+                        point.z = m_surfaceSpline->eval(x);
+
+                        points.append(point);
+                    }
+                }
+
+            m_surfaceModel->updatePoints(points);
+
+            m_scanComplited = true;
+            emit scanStateChanged();
+
+            m_state = m_cutModeEnabled ? AutoCutting : AutoEngraving;
+            emit stateChanged(m_state);
     }
 }
 
@@ -1462,9 +1512,14 @@ float Automator::compensate(float dz) const
 void Automator::checkWorkingState()
 {
     bool working = m_lastdzValid && m_mcConnected && m_lastCoordsValid && m_enabled && m_cameraConnected;
-    if (working != m_working) {
-        m_working = working;
-        emit workingChanged();
+    if (working) {
+        m_working = true;
+        m_state = m_cutModeEnabled ? AutoCutting : AutoEngraving;
+        emit stateChanged(m_state);
+    } else {
+        m_working = false;
+        m_state = Disabled;
+        emit stateChanged(m_state);
     }
 }
 
@@ -1484,6 +1539,16 @@ void Automator::m_scanSnapshot()
         m_message = QString("Z: %1").arg(compensated);
         emit messageChanged();
         qDebug() << m_message;
+
+        SPLINTER::DenseVector x(2);
+        float y;
+
+        x(0) = point.x;
+        x(1) = point.y;
+        y = compensated;
+
+        m_samples.addSample(x,y);
+
         emit continueScan();
     }
 }
@@ -1505,27 +1570,41 @@ float Automator::lastSentPower() const
 
 void Automator::scanSurface(int width, int height, int step)
 {
+    m_scanWidth = width;
+    m_scanHeight = height;
+
     QFile scanGCode("scanGCode.ngc");
     if (scanGCode.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(&scanGCode);
 
-        out << "M220 S100\nM204 S600\nG90 G0 X0 Y0 F15000\nM25\n";
+        out << "M220 S100\nM204 S600\nG90 G0 X0 Y0 F15000\n";
 
-        for (int i=1; i<=height/step; i++)
+        for (int i=0; i<=height/step; i++)
         {
+            out << QString("G0 Y%1\nM25\n").arg(step*i);
+
             for (int j=1; j<=width/step; j++)
                 if (i%2)
                     out << QString("G0 X%1\nM25\n").arg(step*j);
                 else
                     out << QString("G0 X%1\nM25\n").arg(width-step*j);
-
-            out << QString("G0 Y%1\nM25\n").arg(step*i);
         }
 
         out << "G0 X0 Y0";
     }
 
     emit startScan(QUrl("file:scanGCode.ngc"));
+
+    m_state = Scanning;
+    emit stateChanged(m_state);
+}
+
+void Automator::approveScan()
+{
+    m_scanComplited = false;
+    emit scanStateChanged();
+
+    //todo
 }
 
 SurfaceModel *Automator::surfaceModel() const
@@ -1538,27 +1617,10 @@ void Automator::clearSurface() const
     m_surfaceModel->removeAll();
 }
 
-/*void Automator::scanSurface(int width, int height, int step) const
+Automator::State Automator::state() const
 {
-    QFile scanGCode("scanGCode.ngc");
-    if (scanGCode.open(QFile::WriteOnly | QFile::Truncate)) {
-        QTextStream out(&scanGCode);
-
-        out << "M220 S100\nM204 S250\nG90 G0 X0 Y0 F10000\n";
-
-        for (int i=0; i<=height/(step*2); i++)
-        {
-            out << QString(" X%1\n").arg(width)
-                << QString(" Y%1\n").arg(step)
-                << QString(" X-%1\n").arg(width);
-        }
-        if (height % (step*2) >= step)
-            out << QString(" X%1\n").arg(width);
-
-        out << "G0 X0 Y0";
-    }
-
-}*/
+    return m_state;
+}
 
 float Automator::maxPower() const
 {
@@ -1590,14 +1652,9 @@ void Automator::setCutModeEnabled(bool cutMode)
     m_cutModeEnabled = cutMode;
 }
 
-bool Automator::scanApproved() const
+bool Automator::scanComplited() const
 {
-    return m_scanApproved;
-}
-
-void Automator::setScanApproved(bool scanApproved)
-{
-    m_scanApproved = scanApproved;
+    return m_scanComplited;
 }
 
 bool Automator::enabled() const

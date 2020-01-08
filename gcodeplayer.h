@@ -21,6 +21,7 @@ public:
         Stopped,
         Playing,
         Paused,
+        PausedM25,
         Error
     };
     Q_ENUM(State)

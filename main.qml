@@ -6,6 +6,7 @@ import QtMultimedia 5.9
 import io.opencv 1.0
 import tech.vhrd.vision 1.0
 import tech.vhrd 1.0
+import tech.vhrd.automator 1.0
 import QtCharts 2.3
 import QtQuick.Dialogs 1.2
 
@@ -422,7 +423,10 @@ Window {
                         } else if (lstate === GcodePlayer.Paused) {
                             playerStatusLabel.text = "PAUSED"
                             playerStatusLabel.color = "#cddc39"
-                        } else if (lstate === GcodePlayer.Stopped) {
+                        } else if (lstate === GcodePlayer.PausedM25) {
+                            playerStatusLabel.text = "PAUSEDM25"
+                            playerStatusLabel.color = "#cddc39"
+                        }else if (lstate === GcodePlayer.Stopped) {
                             playerStatusLabel.text = "STOPPED"
                             playerStatusLabel.color = "orange"
                         } else if (lstate === GcodePlayer.Error) {
@@ -633,8 +637,31 @@ Window {
                 Text {
                     id: automatorWorkingLabel
                     font.bold: true
-                    text: automator.working ? "working" : "stopped"
-                    color: automator.working ? "green" : "red"
+                    text: "DISABLED"
+                    color: "red"
+
+                    Connections {
+                        target: automator
+                        onStateChanged: {
+                            var lstate = automator.state;
+                            if (lstate === Automator.Disabled) {
+                                playerStatusLabel.text = "DISABLED"
+                                playerStatusLabel.color = "#4caf50"
+                            } else if (lstate === Automator.AutoEngraving) {
+                                playerStatusLabel.text = "ENGRAVING"
+                                playerStatusLabel.color = "#cddc39"
+                            } else if (lstate === Automator.AutoCutting) {
+                                playerStatusLabel.text = "CUTTING"
+                                playerStatusLabel.color = "#cddc39"
+                            }else if (lstate === Automator.Scanning) {
+                                playerStatusLabel.text = "SCANNING"
+                                playerStatusLabel.color = "orange"
+                            } else if (lstate === Automator.Error) {
+                                playerStatusLabel.text = "ERROR"
+                                playerStatusLabel.color = "#f44336"
+                            }
+                        }
+                    }
                 }
 
                 Text {
