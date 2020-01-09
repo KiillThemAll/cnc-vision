@@ -673,22 +673,22 @@ Window {
                     Connections {
                         target: automator
                         onStateChanged: {
-                            var lstate = automator.state;
-                            if (lstate === Automator.Disabled) {
-                                playerStatusLabel.text = "DISABLED"
-                                playerStatusLabel.color = "#4caf50"
-                            } else if (lstate === Automator.AutoEngraving) {
-                                playerStatusLabel.text = "ENGRAVING"
-                                playerStatusLabel.color = "#cddc39"
-                            } else if (lstate === Automator.AutoCutting) {
-                                playerStatusLabel.text = "CUTTING"
-                                playerStatusLabel.color = "#cddc39"
-                            }else if (lstate === Automator.Scanning) {
-                                playerStatusLabel.text = "SCANNING"
-                                playerStatusLabel.color = "orange"
-                            } else if (lstate === Automator.Error) {
-                                playerStatusLabel.text = "ERROR"
-                                playerStatusLabel.color = "#f44336"
+                            var astate = automator.state;
+                            if (astate === Automator.Disabled) {
+                                automatorWorkingLabel.text = "DISABLED"
+                                automatorWorkingLabel.color = "#4caf50"
+                            } else if (astate === Automator.AutoEngraving) {
+                                automatorWorkingLabel.text = "ENGRAVING"
+                                automatorWorkingLabel.color = "#cddc39"
+                            } else if (astate === Automator.AutoCutting) {
+                                automatorWorkingLabel.text = "CUTTING"
+                                automatorWorkingLabel.color = "#cddc39"
+                            }else if (astate === Automator.Scanning) {
+                                automatorWorkingLabel.text = "SCANNING"
+                                automatorWorkingLabel.color = "orange"
+                            } else if (astate === Automator.Error) {
+                                automatorWorkingLabel.text = "ERROR"
+                                automatorWorkingLabel.color = "#f44336"
                             }
                         }
                     }

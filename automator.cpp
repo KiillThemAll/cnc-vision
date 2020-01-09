@@ -1532,10 +1532,10 @@ void Automator::m_scanSnapshot()
         //emit continueScan();
     } else {
         SurfacePoint point;
-        point.x = m_mcs_x-605;
-        point.y = m_mcs_y;
-        point.z = compensated;
-        m_surfaceModel->addPoint(point);
+        //point.x = m_mcs_x-605;
+        //point.y = m_mcs_y;
+        //point.z = compensated;
+        //m_surfaceModel->addPoint(point);
         m_message = QString("Z: %1").arg(compensated);
         emit messageChanged();
         qDebug() << m_message;
@@ -1543,8 +1543,8 @@ void Automator::m_scanSnapshot()
         SPLINTER::DenseVector x(2);
         float y;
 
-        x(0) = m_mcs_x-605;
-        x(1) = m_mcs_y;
+        x(0) = float(qRound(m_mcs_x-605));
+        x(1) = float(qRound(m_mcs_y));
         y = compensated;
 
         m_samples.addSample(x,y);
@@ -1590,7 +1590,7 @@ void Automator::scanSurface(int width, int height, int step)
                     out << QString("G0 X%1\nM25\n").arg(step*j);
         }
 
-        out << "G0 X0 Y0";
+        out << "G0 X0 Y0\n";
     }
 
     emit startScan(QUrl("file:scanGCode.ngc"));

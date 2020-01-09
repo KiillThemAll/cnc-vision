@@ -226,6 +226,7 @@ void GcodePlayer::sendNextLine()
         m_state = PausedM25;
         emit stateChanged(m_state);
         GcodePlayerItem item = m_model->getItem(m_currentLineNumber - 1);
+        item.m_status = GcodePlayerItem::Ok;
         m_model->replaceItem(m_currentLineNumber - 1, item);
         m_currentLineNumber++;
         return;
