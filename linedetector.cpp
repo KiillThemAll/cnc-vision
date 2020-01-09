@@ -21,7 +21,7 @@ LineDetector::LineDetector(CaptureController *captureController, QObject *parent
 
     m_dz = 0;
     m_zerodxs = false;
-    m_dxs0 = 0;
+    m_dxs0 = 126;
     m_ppmm = 9.8833333;
     m_s0 = 124;
     m_f = 3.6;

@@ -1529,10 +1529,10 @@ void Automator::m_scanSnapshot()
     if (compensated > 10) {
         m_message = "No entry in comp table";
         emit messageChanged();
-        emit continueScan();
+        //emit continueScan();
     } else {
         SurfacePoint point;
-        point.x = m_mcs_x;
+        point.x = m_mcs_x-605;
         point.y = m_mcs_y;
         point.z = compensated;
         m_surfaceModel->addPoint(point);
@@ -1543,8 +1543,8 @@ void Automator::m_scanSnapshot()
         SPLINTER::DenseVector x(2);
         float y;
 
-        x(0) = point.x;
-        x(1) = point.y;
+        x(0) = m_mcs_x-605;
+        x(1) = m_mcs_y;
         y = compensated;
 
         m_samples.addSample(x,y);
@@ -1585,9 +1585,9 @@ void Automator::scanSurface(int width, int height, int step)
 
             for (int j=1; j<=width/step; j++)
                 if (i%2)
-                    out << QString("G0 X%1\nM25\n").arg(step*j);
-                else
                     out << QString("G0 X%1\nM25\n").arg(width-step*j);
+                else
+                    out << QString("G0 X%1\nM25\n").arg(step*j);
         }
 
         out << "G0 X0 Y0";
