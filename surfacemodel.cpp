@@ -25,17 +25,23 @@ QVariant SurfaceModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void SurfaceModel::addPoint(const SurfacePoint &point)
+void SurfaceModel::addPointWithoutNotify(const SurfacePoint &point)
 {
     beginInsertRows(QModelIndex(), m_surface.count(), m_surface.count());
     m_surface.append(point);
     endInsertRows();
 }
 
+void SurfaceModel::updatePoints()
+{
+    beginInsertRows(QModelIndex(), 0, m_surface.count()-1);
+    endInsertRows();
+}
+
 void SurfaceModel::updatePoints(const QVector<SurfacePoint> &points)
 {
     removeAll();
-    beginInsertRows(QModelIndex(), 0, m_surface.count());
+    beginInsertRows(QModelIndex(), 0, points.count()-1);
     m_surface.append(points);
     endInsertRows();
 }
@@ -51,7 +57,7 @@ QHash<int, QByteArray> SurfaceModel::roleNames() const
 
 void SurfaceModel::removeAll()
 {
-    beginRemoveRows(QModelIndex(), 0, m_surface.count());
+    beginRemoveRows(QModelIndex(), 0, m_surface.count()-1);
     m_surface.clear();
     endRemoveRows();
 }

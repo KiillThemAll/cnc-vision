@@ -167,7 +167,7 @@ void Automator::scanFinished(GcodePlayer::State s)
 
             delete m_surfaceSpline;
 
-            m_surfaceSpline = new SPLINTER::BSpline(SPLINTER::BSpline::Builder(m_samples).degree(3).build());
+            /*m_surfaceSpline = new SPLINTER::BSpline(SPLINTER::BSpline::Builder(m_samples).degree(3).build());
 
             QVector<SurfacePoint> points;
             SurfacePoint point;
@@ -195,7 +195,7 @@ void Automator::scanFinished(GcodePlayer::State s)
             emit scanStateChanged();
 
             m_state = m_cutModeEnabled ? AutoCutting : AutoEngraving;
-            emit stateChanged(m_state);
+            emit stateChanged(m_state);*/
     }
 }
 
@@ -2202,22 +2202,22 @@ void Automator::m_scanSnapshot()
         //emit continueScan();
     } else {
         SurfacePoint point;
-        //point.x = m_mcs_x-605;
-        //point.y = m_mcs_y;
-        //point.z = compensated;
-        //m_surfaceModel->addPoint(point);
+        point.x = qRound(m_mcs_x-605);
+        point.y = qRound(m_mcs_y);
+        point.z = compensated;
+        m_surfaceModel->addPointWithoutNotify(point);
         m_message = QString("Z: %1").arg(compensated);
         emit messageChanged();
         qDebug() << m_message;
 
-        SPLINTER::DenseVector x(2);
+        /*SPLINTER::DenseVector x(2);
         float y;
 
-        x(0) = float(qRound(m_mcs_x-605));
-        x(1) = float(qRound(m_mcs_y));
+        x(0) = qRound(m_mcs_x-605);
+        x(1) = qRound(m_mcs_y);
         y = compensated;
 
-        m_samples.addSample(x,y);
+        m_samples.addSample(x,y);*/
 
         emit continueScan();
     }
@@ -2240,6 +2240,28 @@ float Automator::lastSentPower() const
 
 void Automator::scanSurface(int width, int height, int step)
 {
+
+    /*SurfacePoint point;
+
+    for (int i=0; i<=height/step; i++)
+    {
+        for (int j=1; j<=width/step; j++)
+            if (i%2)
+            {
+                point.x = width-step*j;
+                point.y = i;
+                point.z = i+width-step*j;
+                m_surfaceModel->addPointWithoutNotify(point);
+            }
+            else
+            {
+                point.x = step*j;
+                point.y = i;
+                point.z = i+step*j;
+                m_surfaceModel->addPointWithoutNotify(point);
+            }
+    }*/
+
     m_scanWidth = width;
     m_scanHeight = height;
 
@@ -2264,6 +2286,7 @@ void Automator::scanSurface(int width, int height, int step)
     }
 
     emit startScan(QUrl("file:scanGCode.ngc"));
+
 
     m_state = Scanning;
     emit stateChanged(m_state);
