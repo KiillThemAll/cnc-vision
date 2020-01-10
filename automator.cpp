@@ -2269,7 +2269,7 @@ void Automator::scanSurface(int width, int height, int step)
     if (scanGCode.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(&scanGCode);
 
-        out << "M220 S100\nM204 S600\nG90 G0 X0 Y0 F15000\n";
+        out << "M220 S100\nM204 S600\nG90 G0 X0 Y0 F10000\n";
 
         for (int i=0; i<=height/step; i++)
         {

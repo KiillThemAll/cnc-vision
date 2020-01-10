@@ -44,7 +44,7 @@ Window {
                 focus: true
                 font.pointSize: 20
 
-                text: "1500"
+                text: "100"
 
                 validator: IntValidator{bottom:0; top:1525}
             }
@@ -67,7 +67,7 @@ Window {
                 focus: true
                 font.pointSize: 20
 
-                text: "1500"
+                text: "100"
 
                 validator: IntValidator{bottom:0; top:1525}
             }
@@ -88,7 +88,7 @@ Window {
                 focus: true
                 font.pointSize: 20
 
-                text: "20"
+                text: "10"
 
                 validator: IntValidator{bottom:0; top:1525}
             }
@@ -189,7 +189,7 @@ Window {
             width: surfaceView.width
             height: surfaceView.height
             theme: Theme3D {
-                type: Theme3D.ThemeEbony
+                type: Theme3D.ThemeStoneMoss
                 font.family: "STCaiyun"
                 font.pointSize: 35
                 //colorStyle: Theme3D.ColorStyleRangeGradient
