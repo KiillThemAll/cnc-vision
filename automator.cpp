@@ -194,8 +194,7 @@ void Automator::scanFinished(GcodePlayer::State s)
             m_scanComplited = true;
             emit scanStateChanged();
 
-            m_state = m_cutModeEnabled ? AutoCutting : AutoEngraving;
-            emit stateChanged(m_state);*/
+            checkWorkingSate();*/
     }
 }
 
@@ -2205,7 +2204,8 @@ void Automator::m_scanSnapshot()
         point.x = qRound(m_mcs_x-605);
         point.y = qRound(m_mcs_y);
         point.z = compensated;
-        m_surfaceModel->addPointWithoutNotify(point);
+        m_surfaceModel->updatePoint(point, scanSnapshotNumber);
+        scanSnapshotNumber++;
         m_message = QString("Z: %1").arg(compensated);
         emit messageChanged();
         qDebug() << m_message;
@@ -2265,6 +2265,10 @@ void Automator::scanSurface(int width, int height, int step)
     m_scanWidth = width;
     m_scanHeight = height;
 
+    m_surfaceModel->createZeroSurface(width,height,step);
+
+    scanSnapshotNumber = 0;
+
     QFile scanGCode("scanGCode.ngc");
     if (scanGCode.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(&scanGCode);
@@ -2296,6 +2300,8 @@ void Automator::approveScan()
 {
     m_scanComplited = false;
     emit scanStateChanged();
+
+    checkWorkingState();
 
     //todo
 }

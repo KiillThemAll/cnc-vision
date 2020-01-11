@@ -21,8 +21,7 @@ public:
     SurfaceModel(QObject *parent = nullptr);
 
     enum ItemRoles {
-        StatusRole = Qt::UserRole + 1,
-        x,
+        x = Qt::UserRole + 1,
         y,
         z
     };
@@ -30,8 +29,8 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-    void addPointWithoutNotify(const SurfacePoint &point);
-    void updatePoints();
+    void createZeroSurface(int width, int height, int step);
+    void updatePoint(const SurfacePoint &point, int pos);
     void updatePoints(const QVector<SurfacePoint> &points);
 
     void removeAll();

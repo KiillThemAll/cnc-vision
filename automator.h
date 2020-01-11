@@ -131,6 +131,7 @@ private:
     SPLINTER::BSpline *m_surfaceSpline;
     float m_scanWidth;
     float m_scanHeight;
+    int scanSnapshotNumber;
 
 private slots:
     void m_scanSnapshot();
