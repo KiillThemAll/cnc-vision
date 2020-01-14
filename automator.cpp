@@ -136,7 +136,7 @@ void Automator::compensate()
         qDebug() << "Command: " << correction;
         if (m_autosendB) {
             emit sendToMC(correction);
-            emit sendToMC("M24\n");
+            //emit sendToMC("M24\n");
         }
     }
 }
