@@ -67,7 +67,7 @@ void RayReceiver::processPayload(QNetworkDatagram datagram)
     //qDebug() << "state: " << m_payload.state << "\tplayed:" << m_payload.played << "\ttotal:" << m_payload.total;
 
     if (m_lastState != (State)m_payload.state && (State)m_payload.state == State::Paused) {
-        //QThread::sleep(1);
+        QThread::msleep(500);
     }
 
     m_lastState = (State)m_payload.state;

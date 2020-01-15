@@ -141,7 +141,7 @@ void LineDetector::onFrameReady()
         dxs -= m_dxs0;
         //float M = m_f / (m_s0 - m_f);
         //float dx = dxs / (M * m_ppmm);
-        m_dz = (m_lz * dxs * (m_s0 - m_f) ) / (m_lx * m_f * m_ppmm - m_lz * dxs);
+        m_dz = dxs;//(m_lz * dxs * (m_s0 - m_f) ) / (m_lx * m_f * m_ppmm - m_lz * dxs);
         emit dzChanged();
         /*if (m_dz<0)
             qDebug() << m_dz;

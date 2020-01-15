@@ -102,7 +102,7 @@ void Automator::onMcStateChanged(RayReceiver::State s)
 
         if (!m_compensatorOneShot)
         {
-            QTimer::singleShot(1000, this, SLOT(compensate()));
+            QTimer::singleShot(2000, this, SLOT(compensate()));
             m_compensatorOneShot = true;
         }
     }
@@ -136,7 +136,7 @@ void Automator::compensate()
         qDebug() << "Command: " << correction;
         if (m_autosendB) {
             emit sendToMC(correction);
-            //emit sendToMC("M24\n");
+            emit sendToMC("M24\n");
         }
     }
 }
