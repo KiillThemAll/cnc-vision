@@ -163,8 +163,8 @@ Window {
                     from: 0
                     to: 1
                     stepSize: 0.01
-                    first.value: 0.57
-                    second.value: 0.77
+                    first.value: 0.18
+                    second.value: 0.28
                     first.onMoved: lineDetector.integrateFrom = first.value
                     second.onMoved: lineDetector.integrateTo = second.value
                     Component.onCompleted: {
@@ -186,7 +186,7 @@ Window {
                     from: 0
                     to: 1
                     stepSize: 0.01
-                    value: 0.12
+                    value: 0.07
                     onValueChanged: lineDetector.threshold = value
                     Component.onCompleted: {
                         lineDetector.threshold = value
@@ -205,7 +205,7 @@ Window {
                     from: -15
                     to: 15
                     stepSize: 0.1
-                    value: 2
+                    value: 0
                     onValueChanged: lineDetector.rotation = value
                     Component.onCompleted: {
                         lineDetector.rotation = value
