@@ -186,7 +186,7 @@ Window {
                     from: 0
                     to: 1
                     stepSize: 0.01
-                    value: 0.07
+                    value: 0.06
                     onValueChanged: lineDetector.threshold = value
                     Component.onCompleted: {
                         lineDetector.threshold = value
