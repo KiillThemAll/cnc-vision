@@ -112,7 +112,7 @@ void SurfaceModel::sortPoints()
     QVector<SurfacePoint>::const_iterator it;
     it = m_surface.begin();
     it++;
-    while(it!=m_surface.end() && it->x > current) {colNum++; current = it->x;};
+    while(it!=m_surface.end() && it->x > current) {colNum++; current = it->x; it++;};
 
     int rowNum = m_surface.count() / colNum;
 
@@ -123,9 +123,9 @@ void SurfaceModel::sortPoints()
     {
         for (int j=0; j<colNum; j++)
             if (i%2)
-                sorted.append(m_surface.at(j+colNum*i));
+                sorted.append(m_surface.at(colNum-j+colNum*i-1));
             else
-                sorted.append(m_surface.at(colNum-j+colNum*i));
+                sorted.append(m_surface.at(j+colNum*i));
     }
 
     updatePoints(sorted);

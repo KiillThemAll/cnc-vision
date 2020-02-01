@@ -88,7 +88,7 @@ Window {
                 focus: true
                 font.pointSize: 20
 
-                text: "10"
+                text: "50"
 
                 validator: IntValidator{bottom:0; top:1525}
             }
