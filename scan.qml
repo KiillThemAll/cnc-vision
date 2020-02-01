@@ -104,6 +104,7 @@ Window {
         Text {
             font.pointSize: 20
             text: automator.message
+            color: "white"
         }
 
         Button {
@@ -121,53 +122,6 @@ Window {
 
 
     }
-
-    /*ListModel {
-            id: dataModel
-            ListElement{ longitude: "0"; latitude: "0"; height: "124"; }
-            ListElement{ longitude: "0"; latitude: "1"; height: "125"; }
-            ListElement{ longitude: "0"; latitude: "2"; height: "124"; }
-            //! [0]
-            ListElement{ longitude: "0"; latitude: "3"; height: "118"; }
-            ListElement{ longitude: "0"; latitude: "4"; height: "112"; }
-            ListElement{ longitude: "0"; latitude: "5"; height: "111"; }
-            ListElement{ longitude: "0"; latitude: "6"; height: "115"; }
-            ListElement{ longitude: "0"; latitude: "7"; height: "102"; }
-            ListElement{ longitude: "0"; latitude: "8"; height: "115"; }
-            ListElement{ longitude: "0"; latitude: "9"; height: "126"; }
-            ListElement{ longitude: "0"; latitude: "10"; height: "127"; }
-            ListElement{ longitude: "0"; latitude: "11"; height: "127"; }
-            ListElement{ longitude: "0"; latitude: "12"; height: "124"; }
-            ListElement{ longitude: "0"; latitude: "13"; height: "120"; }
-            ListElement{ longitude: "0"; latitude: "14"; height: "117"; }
-            ListElement{ longitude: "0"; latitude: "15"; height: "116"; }
-            ListElement{ longitude: "0"; latitude: "16"; height: "114"; }
-            ListElement{ longitude: "0"; latitude: "17"; height: "112"; }
-            ListElement{ longitude: "0"; latitude: "18"; height: "114"; }
-            ListElement{ longitude: "0"; latitude: "19"; height: "114"; }
-            ListElement{ longitude: "0"; latitude: "20"; height: "112"; }
-            ListElement{ longitude: "1"; latitude: "20"; height: "112"; }
-            ListElement{ longitude: "1"; latitude: "19"; height: "120"; }
-            ListElement{ longitude: "1"; latitude: "18"; height: "120"; }
-            ListElement{ longitude: "1"; latitude: "17"; height: "118"; }
-            ListElement{ longitude: "1"; latitude: "16"; height: "110"; }
-            ListElement{ longitude: "1"; latitude: "15"; height: "105"; }
-            ListElement{ longitude: "1"; latitude: "14"; height: "110"; }
-            ListElement{ longitude: "1"; latitude: "13"; height: "116"; }
-            ListElement{ longitude: "1"; latitude: "12"; height: "117"; }
-            ListElement{ longitude: "1"; latitude: "11"; height: "123"; }
-            ListElement{ longitude: "1"; latitude: "10"; height: "128"; }
-            ListElement{ longitude: "1"; latitude: "9"; height: "131"; }
-            ListElement{ longitude: "1"; latitude: "8"; height: "130"; }
-            ListElement{ longitude: "1"; latitude: "7"; height: "128"; }
-            ListElement{ longitude: "1"; latitude: "6"; height: "122"; }
-            ListElement{ longitude: "1"; latitude: "5"; height: "119"; }
-            ListElement{ longitude: "1"; latitude: "4"; height: "116"; }
-            ListElement{ longitude: "1"; latitude: "3"; height: "113"; }
-            ListElement{ longitude: "1"; latitude: "2"; height: "109"; }
-            ListElement{ longitude: "1"; latitude: "1"; height: "109"; }
-            ListElement{ longitude: "1"; latitude: "0"; height: "109"; }
-        }*/
 
     Item {
         id: surfaceView
@@ -196,7 +150,6 @@ Window {
                 //baseGradients: [surfaceGradient]
             }
             shadowQuality: AbstractGraph3D.ShadowQualityNone
-            //selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
             selectionMode: AbstractGraph3D.SelectionNone
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeft
             axisX.min: 0.0
@@ -215,8 +168,8 @@ Window {
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%i"
             axisY.title: "Z"
-            axisX.title: "Latitude"
-            axisZ.title: "Longitude"
+            axisX.title: "X"
+            axisZ.title: "Y"
 
             Surface3DSeries {
                 id: surfaceSeries
@@ -228,9 +181,6 @@ Window {
                     rowRole: "y"
                     columnRole: "x"
                     yPosRole: "z"
-                    /*rowRole: "longitude"
-                    columnRole: "latitude"
-                    yPosRole: "height"*/
                 }
             }
         }

@@ -35,6 +35,10 @@ public:
 
     void removeAll();
 
+    void sortPoints();
+
+    QVector<SurfacePoint> m_surface;
+
 protected:
     QHash<int, QByteArray> roleNames() const override;
 
@@ -42,7 +46,7 @@ signals:
 
 private:
 
-    QVector<SurfacePoint> m_surface;
+
 };
 
 

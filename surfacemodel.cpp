@@ -101,3 +101,32 @@ void SurfaceModel::removeAll()
     m_surface.squeeze();
     endRemoveRows();
 }
+
+void SurfaceModel::sortPoints()
+{
+    if (!m_surface.count())
+        return;
+
+    int colNum = 1;
+    int current = 0;
+    QVector<SurfacePoint>::const_iterator it;
+    it = m_surface.begin();
+    it++;
+    while(it!=m_surface.end() && it->x > current) {colNum++; current = it->x;};
+
+    int rowNum = m_surface.count() / colNum;
+
+    QVector<SurfacePoint> sorted;
+    sorted.reserve(m_surface.count());
+
+    for (int i=0; i<rowNum; i++)
+    {
+        for (int j=0; j<colNum; j++)
+            if (i%2)
+                sorted.append(m_surface.at(j+colNum*i));
+            else
+                sorted.append(m_surface.at(colNum-j+colNum*i));
+    }
+
+    updatePoints(sorted);
+}

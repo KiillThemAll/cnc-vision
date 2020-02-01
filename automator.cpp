@@ -167,11 +167,24 @@ void Automator::scanFinished(GcodePlayer::State s)
 
             delete m_surfaceSpline;
 
-            /*m_surfaceSpline = new SPLINTER::BSpline(SPLINTER::BSpline::Builder(m_samples).degree(3).build());
+            m_surfaceModel->sortPoints();
+
+            SPLINTER::DenseVector x(2);
+            float y;
+
+            SurfacePoint point;
+
+            foreach (point, m_surfaceModel->m_surface) {
+                x(0) = point.x;
+                x(1) = point.y;
+                y = point.z;
+
+                m_samples.addSample(x,y);
+            }
+
+            m_surfaceSpline = new SPLINTER::BSpline(SPLINTER::BSpline::Builder(m_samples).degree(3).build());
 
             QVector<SurfacePoint> points;
-            SurfacePoint point;
-            SPLINTER::DenseVector x(2);
 
             points.reserve((m_scanWidth+1)*(m_scanHeight+1));
 
@@ -194,7 +207,7 @@ void Automator::scanFinished(GcodePlayer::State s)
             m_scanComplited = true;
             emit scanStateChanged();
 
-            checkWorkingSate();*/
+            checkWorkingState();
     }
 }
 
@@ -514,7 +527,8 @@ void Automator::m_scanSnapshot()
     if (compensated > 10) {
         m_message = "No entry in comp table";
         emit messageChanged();
-        //emit continueScan();
+        m_state = EntryMissing;
+        emit stateChanged(m_state);
     } else {
         SurfacePoint point;
         point.x = qRound(m_mcs_x-605);
@@ -620,6 +634,31 @@ void Automator::approveScan()
     checkWorkingState();
 
     //todo
+}
+
+void Automator::addMissingEntry(float entry)
+{
+    SurfacePoint point;
+    point.x = qRound(m_mcs_x-605);
+    point.y = qRound(m_mcs_y);
+    point.z = entry;
+    m_surfaceModel->updatePoint(point, scanSnapshotNumber);
+    scanSnapshotNumber++;
+    m_message = QString("Z: %1").arg(entry);
+    emit messageChanged();
+    qDebug() << m_message;
+
+    /*SPLINTER::DenseVector x(2);
+    float y;
+
+    x(0) = qRound(m_mcs_x-605);
+    x(1) = qRound(m_mcs_y);
+    y = compensated;
+
+    m_samples.addSample(x,y);*/
+
+    emit continueScan();
+
 }
 
 SurfaceModel *Automator::surfaceModel() const

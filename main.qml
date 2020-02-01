@@ -686,8 +686,8 @@ Window {
                             }else if (astate === Automator.Scanning) {
                                 automatorWorkingLabel.text = "SCANNING"
                                 automatorWorkingLabel.color = "orange"
-                            } else if (astate === Automator.Error) {
-                                automatorWorkingLabel.text = "ERROR"
+                            } else if (astate === Automator.EntryMissing) {
+                                automatorWorkingLabel.text = "ENTRY MISSING"
                                 automatorWorkingLabel.color = "#f44336"
                             }
                         }

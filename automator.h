@@ -41,7 +41,7 @@ public:
         AutoEngraving,
         AutoCutting,
         Scanning,
-        Error
+        EntryMissing
     };
     Q_ENUM(State)
 
@@ -71,6 +71,7 @@ public:
 
     Q_INVOKABLE void scanSurface(int width, int height, int step);
     Q_INVOKABLE void approveScan();
+    Q_INVOKABLE void addMissingEntry(float entry);
 
     SurfaceModel *surfaceModel() const;
 
