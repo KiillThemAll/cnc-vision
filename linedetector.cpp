@@ -19,14 +19,23 @@ LineDetector::LineDetector(CaptureController *captureController, QObject *parent
 
     m_state = Unlocked;
 
-    m_dz = 0;
+    /*m_dz = 0;
     m_zerodxs = false;
     m_dxs0 = 126;
     m_ppmm = 9.8833333;
     m_s0 = 124;
     m_f = 3.6;
     m_lz = 36;
-    m_lx = 243;
+    m_lx = 243;*/
+
+    m_dz = 0;
+    m_zerodxs = false;
+    m_dxs0 = 0;
+    m_ppmm = 348.432;
+    m_s0 = 124;
+    m_f = 3.6;
+    m_lz = 130;
+    m_lx = 180;
 
     m_angle = 0;
 
@@ -143,6 +152,10 @@ void LineDetector::onFrameReady()
         //float dx = dxs / (M * m_ppmm);
         m_dz = (m_lz * dxs * (m_s0 - m_f) ) / (m_lx * m_f * m_ppmm - m_lz * dxs);
         emit dzChanged();
+        /*if (m_dz<0)
+            qDebug() << m_dz;
+        else
+            qDebug() << m_dz;*/
         emit dzChanged(m_dz);
 
         if (m_state != Locked) {
