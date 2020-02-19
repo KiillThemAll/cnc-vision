@@ -27,15 +27,18 @@ QVariant SurfaceModel::data(const QModelIndex &index, int role) const
 
 void SurfaceModel::createZeroSurface(int width, int height, int step)
 {
-    beginInsertRows(QModelIndex(), 0, ((width/step+1)*(height/step+1)-1));
+    surfaceRowNum = height/step+1;
+    surfaceColNum = width/step+1;
+
+    beginInsertRows(QModelIndex(), 0, ((surfaceColNum+1)*(surfaceRowNum+1)-1));
 
     SurfacePoint point;
 
-    for (int i=0; i<=height/step; i++)
+    for (int i=0; i<=surfaceRowNum; i++)
     {
         if (i%2)
         {
-            point.x = (width/step)*step;
+            point.x = (surfaceColNum)*step;
             point.y = step*i;
             point.z = 0;
             m_surface.append(point);
@@ -48,7 +51,7 @@ void SurfaceModel::createZeroSurface(int width, int height, int step)
             m_surface.append(point);
         }
 
-        for (int j=1; j<=width/step; j++)
+        for (int j=1; j<=surfaceColNum; j++)
             if (i%2)
             {
                 point.x = width-step*j;
@@ -107,26 +110,26 @@ void SurfaceModel::sortPoints()
     if (!m_surface.count())
         return;
 
-    int colNum = 1;
+    /*int colNum = 1;
     int current = 0;
     QVector<SurfacePoint>::const_iterator it;
     it = m_surface.begin();
     it++;
     while(it!=m_surface.end() && it->x > current) {colNum++; current = it->x; it++;};
 
-    int rowNum = m_surface.count() / colNum;
+    int rowNum = m_surface.count() / colNum;*/
 
-    QVector<SurfacePoint> sorted;
-    sorted.reserve(m_surface.count());
+    m_surfaceSorted.clear();
+    m_surfaceSorted.squeeze();
 
-    for (int i=0; i<rowNum; i++)
+    m_surfaceSorted.reserve(m_surface.count());
+
+    for (int i=0; i<surfaceRowNum; i++)
     {
-        for (int j=0; j<colNum; j++)
+        for (int j=0; j<surfaceColNum; j++)
             if (i%2)
-                sorted.append(m_surface.at(colNum-j+colNum*i-1));
+                m_surfaceSorted.append(m_surface.at(surfaceColNum-j+surfaceColNum*i-1));
             else
-                sorted.append(m_surface.at(j+colNum*i));
+                m_surfaceSorted.append(m_surface.at(j+surfaceColNum*i));
     }
-
-    updatePoints(sorted);
 }

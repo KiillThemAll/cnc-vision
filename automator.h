@@ -24,7 +24,7 @@ class Automator : public QObject
     Q_OBJECT
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
     Q_PROPERTY(bool cutModeEnabled READ cutModeEnabled WRITE setCutModeEnabled)
-    Q_PROPERTY(bool scanComplited READ scanComplited NOTIFY scanStateChanged)
+    //Q_PROPERTY(bool scanComplited READ scanComplited NOTIFY scanStateChanged)
     Q_PROPERTY(QString message READ message NOTIFY messageChanged)
     Q_PROPERTY(bool autosendPower READ autosendPower WRITE setAutosendPower)
     Q_PROPERTY(float minPower READ minPower WRITE setMinPower)
@@ -56,7 +56,7 @@ public:
     bool cutModeEnabled() const;
     void setCutModeEnabled(bool cutMode);
 
-    bool scanComplited() const;
+    //bool scanComplited() const;
 
     bool autosendPower() const;
     void setAutosendPower(bool autosendPower);
@@ -70,7 +70,7 @@ public:
     float lastSentPower() const;
 
     Q_INVOKABLE void scanSurface(int width, int height, int step);
-    Q_INVOKABLE void approveScan();
+    //Q_INVOKABLE void approveScan();
     Q_INVOKABLE void addMissingEntry(float entry);
 
     SurfaceModel *surfaceModel() const;
@@ -78,6 +78,8 @@ public:
     Q_INVOKABLE void clearSurface() const;
 
     State state() const;
+
+    float interpolateFromSurfaceScan(const SurfacePoint &point);
 
 signals:
     void enabledChanged();
@@ -87,7 +89,7 @@ signals:
     void startScan(const QUrl &fileUrl);
     void continueScan();
     void stateChanged(State s);
-    void scanStateChanged();
+    //void scanStateChanged();
 
 public slots:
     void ondzChanged(float dz);
@@ -98,6 +100,7 @@ public slots:
     void onMcStateChanged(RayReceiver::State s);
     void onCameraStateChanged(CaptureController::Status s);
     void compensate();
+    void compensateFromScan();
     void scanSnapshot(GcodePlayer::State s);
     void scanFinished(GcodePlayer::State s);
 
@@ -128,8 +131,8 @@ private:
     SurfaceModel *m_surfaceModel;
     State m_state;
 
-    SPLINTER::DataTable m_samples;
-    SPLINTER::BSpline *m_surfaceSpline;
+    //SPLINTER::DataTable m_samples;
+    //SPLINTER::BSpline *m_surfaceSpline;
     float m_scanWidth;
     float m_scanHeight;
     int scanSnapshotNumber;

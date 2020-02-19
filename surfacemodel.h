@@ -39,6 +39,11 @@ public:
 
     QVector<SurfacePoint> m_surface;
 
+    QVector<SurfacePoint> m_surfaceSorted;
+
+    int surfaceRowNum;
+    int surfaceColNum;
+
 protected:
     QHash<int, QByteArray> roleNames() const override;
 
