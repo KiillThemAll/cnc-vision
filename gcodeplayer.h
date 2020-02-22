@@ -54,6 +54,7 @@ signals:
     void stateChanged(State s);
     void connectionStateChanged();
     void connectionStateChanged(bool connected);
+    void answerReceived();
 
 
 public slots:
@@ -64,6 +65,7 @@ public slots:
     void send(const QString &command);
     void startFile(const QUrl &fileUrl);
     void continueFromM25();
+    void sendWithAnswer(const QString &command);
 
 
 
@@ -84,6 +86,7 @@ private:
     QTcpSocket *m_tcp;
     QString m_tcpLine;
     bool m_querySent;
+    bool m_externalRequestForAnswer;
 };
 
 #endif // GCODEPLAYER_H

@@ -46,12 +46,6 @@ public:
 
 protected:
     QHash<int, QByteArray> roleNames() const override;
-
-signals:
-
-private:
-
-
 };
 
 

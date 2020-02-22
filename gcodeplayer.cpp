@@ -24,6 +24,7 @@ GcodePlayer::GcodePlayer(QObject *parent) : QObject(parent)
     connect(m_tcp, &QIODevice::readyRead,
             this,  &GcodePlayer::onMCResponse);
     m_querySent = false;
+    m_externalRequestForAnswer = false;
 }
 
 void GcodePlayer::registerQmlTypes()
@@ -113,6 +114,12 @@ void GcodePlayer::continueFromM25()
     sendNextLine();
     m_state = Playing;
     emit stateChanged(m_state);
+}
+
+void GcodePlayer::sendWithAnswer(const QString &command)
+{
+    m_externalRequestForAnswer = true;
+    send(command);
 }
 
 void GcodePlayer::connectToMC()
@@ -237,6 +244,13 @@ void GcodePlayer::sendNextLine()
 
 void GcodePlayer::processMCResponse(const QString &line)
 {
+    if (m_externalRequestForAnswer){
+        m_externalRequestForAnswer = false;
+        if (line == "ok") {
+            emit answerReceived();
+        }
+
+    }
     if (m_querySent) {
         qDebug() << "mc q:" << line;
         m_querySent = false;

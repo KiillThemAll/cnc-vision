@@ -4,14 +4,14 @@ import QtQuick.Dialogs 1.2
 
 
 Dialog {
-    visible: true
+    //visible: true
     title: "Focus entry missing"
 
     standardButtons: StandardButton.Apply | StandardButton.Cancel
 
-    onApply: {automator.addMissingEntry(parseFloat(input.text))}
+    onApply: {automator.addMissingEntry(Number.fromLocaleString(Qt.locale("ru_RU"), input.text))}
 
-    contentItem: FocusScope {
+    FocusScope {
         width: 96; height: 30
         Rectangle {
             anchors.fill: parent
@@ -24,7 +24,7 @@ Dialog {
             focus: true
             font.pointSize: 20
 
-            validator: DoubleValidator{bottom:-20; top:20}
+            validator: DoubleValidator{}
         }
     }
 }

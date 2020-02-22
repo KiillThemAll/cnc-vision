@@ -23,13 +23,14 @@ Automator::Automator(QObject *parent) : QObject(parent)
     m_compensatorOneShot = false;
     m_scanOneShot = false;
 
-    //m_surfaceModel = new SurfaceModel(this);
+    m_surfaceModel = new SurfaceModel(this);
 
     m_state = Disabled;
 
     m_scanComplited = false;
+    m_scanApprooved = false;
 
-    m_surfaceSpline = nullptr;
+    //m_surfaceSpline = nullptr;
 }
 
 Automator::~Automator()
@@ -188,7 +189,7 @@ void Automator::scanFinished(GcodePlayer::State s)
         m_surfaceModel->sortPoints();
 
         m_scanComplited = true;
-        //emit scanStateChanged();
+        emit scanStateChanged();
 
         checkWorkingState();
     }
@@ -531,20 +532,74 @@ float Automator::compensate(float dz) const
 
 void Automator::compensateFromScan()
 {
-    if (!m_working || !m_cutModeEnabled || !m_scanComplited)
-        return;
-    float compensated = interpolateFromScan(m_lastdz);
+    if (m_working || m_cutModeEnabled || m_scanApprooved){
+        float compensated = interpolateFromScan(m_lastdz);
 
-    QString correction = QString("G90 G0 B%1\n").arg(compensated);
-    m_message = correction;
-    emit messageChanged();
-    qDebug() << correction;
-    emit sendToMC(correction);
+        QString correction = QString("G90 G1 B%1\n").arg(compensated);
+        m_message = correction;
+        emit messageChanged();
+        qDebug() << correction;
+        emit sendToMCWithAnswer(correction);
+    }
+}
+
+void Automator::answerFromMCReceived()
+{
+    QTimer::singleShot(1000, this, SLOT(compensateFromScan()));
 }
 
 float Automator::interpolateFromSurfaceScan(const SurfacePoint &point)
 {
+    const int mapSizeX = m_surfaceModel->surfaceColNum;
+    const int mapSizeY = m_surfaceModel->surfaceRowNum;
 
+    float x1;
+    float x2;
+    int rangeX = -1;
+    for (int i = 0; i < mapSizeX-1; i++) {
+        if (point.x >= m_surfaceModel->m_surfaceSorted.at(i).x && point.x < m_surfaceModel->m_surfaceSorted.at(i+1).x) {
+            x1 = m_surfaceModel->m_surfaceSorted.at(i).x;
+            x2 = m_surfaceModel->m_surfaceSorted.at(i+1).x;
+            rangeX = i;
+            break;
+        }
+    }
+    if (rangeX == -1)
+        return 1000;
+
+    float y1;
+    float y2;
+    int rangeY = -1;
+    for (int i = 0; i < mapSizeY-1; i++) {
+        if (point.y >= m_surfaceModel->m_surfaceSorted.at(i*mapSizeX).y && point.y < m_surfaceModel->m_surfaceSorted.at(i*mapSizeX+mapSizeX).y) {
+            y1 = m_surfaceModel->m_surfaceSorted.at(i*mapSizeX).y;
+            y2 = m_surfaceModel->m_surfaceSorted.at(i*mapSizeX+mapSizeX).y;
+            rangeY = i;
+            break;
+        }
+    }
+    if (rangeY == -1)
+        return 1000;
+
+    float z11 = m_surfaceModel->m_surfaceSorted.at(rangeY*mapSizeX+rangeX);
+    float z12 = m_surfaceModel->m_surfaceSorted.at(rangeY*mapSizeX+rangeX+1);
+    float z21 = m_surfaceModel->m_surfaceSorted.at(rangeY*mapSizeX+mapSizeX+rangeX);
+    float z22 = m_surfaceModel->m_surfaceSorted.at(rangeY*mapSizeX+mapSizeX+rangeX+1);
+
+
+    float rangeSpanX = x2-x1;
+    float rangeSpanY = y2-y1;
+    float distX = (point.x - x1) / rangeSpanX;
+    float distY = (point.y - y1) / rangeSpanY;
+
+    float valueSpanX1 = z12 - z11;
+    float interpolatedX1 = z11 + valueSpanX1 * distX;
+
+    float valueSpanX2 = z22 - z21;
+    float interpolatedX2 = z21 + valueSpanX2 * distX;
+
+    float valueSpanY = interpolatedX2 - interpolatedX1;
+    return interpolatedX1 + valueSpanY * distY;
 }
 
 void Automator::checkWorkingState()
@@ -631,7 +686,6 @@ void Automator::scanSurface(int width, int height, int step)
                 m_surfaceModel->addPointWithoutNotify(point);
             }
     }*/
-
     m_scanWidth = width;
     m_scanHeight = height;
 
@@ -666,17 +720,20 @@ void Automator::scanSurface(int width, int height, int step)
     emit stateChanged(m_state);
 
     m_scanComplited = false;
+    m_scanApprooved = false;
 }
 
-/*void Automator::approveScan()
+void Automator::approveScan()
 {
     m_scanComplited = false;
     emit scanStateChanged();
 
+    m_scanApprooved = true;
+
     checkWorkingState();
 
-    //todo
-}*/
+    QTimer::singleShot(1000, this, SLOT(compensateFromScan()));
+}
 
 void Automator::addMissingEntry(float entry)
 {
@@ -749,10 +806,10 @@ void Automator::setCutModeEnabled(bool cutMode)
     checkWorkingState();
 }
 
-/*bool Automator::scanComplited() const
+bool Automator::scanComplited() const
 {
     return m_scanComplited;
-}*/
+}
 
 bool Automator::enabled() const
 {
