@@ -30,15 +30,15 @@ void SurfaceModel::createZeroSurface(int width, int height, int step)
     surfaceRowNum = height/step+1;
     surfaceColNum = width/step+1;
 
-    beginInsertRows(QModelIndex(), 0, ((surfaceColNum+1)*(surfaceRowNum+1)-1));
+    beginInsertRows(QModelIndex(), 0, ((surfaceColNum)*(surfaceRowNum)-1));
 
     SurfacePoint point;
 
-    for (int i=0; i<=surfaceRowNum; i++)
+    for (int i=0; i<surfaceRowNum; i++)
     {
         if (i%2)
         {
-            point.x = (surfaceColNum)*step;
+            point.x = (surfaceColNum-1)*step;
             point.y = step*i;
             point.z = 0;
             m_surface.append(point);
@@ -51,7 +51,7 @@ void SurfaceModel::createZeroSurface(int width, int height, int step)
             m_surface.append(point);
         }
 
-        for (int j=1; j<=surfaceColNum; j++)
+        for (int j=1; j<surfaceColNum; j++)
             if (i%2)
             {
                 point.x = width-step*j;

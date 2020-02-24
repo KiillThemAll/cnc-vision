@@ -4,6 +4,7 @@ import QtQuick.Controls 2.6
 import QtQuick.Layouts 1.12
 import QtDataVisualization 1.2
 import QtQuick.Dialogs 1.2
+import tech.vhrd.automator 1.0
 
 Window {
     id: scanWindow
@@ -110,7 +111,7 @@ Window {
 
         Button {
             text: "Approve scan"
-            enabled: automator.scanComplited
+            //enabled: automator.scanComplited
 
             onClicked: automator.approveScan()
         }

@@ -35,7 +35,7 @@ Automator::Automator(QObject *parent) : QObject(parent)
 
 Automator::~Automator()
 {
-    delete m_surfaceSpline;
+    //delete m_surfaceSpline;
 }
 
 bool Automator::working() const
@@ -533,7 +533,10 @@ float Automator::compensate(float dz) const
 void Automator::compensateFromScan()
 {
     if (m_working || m_cutModeEnabled || m_scanApprooved){
-        float compensated = interpolateFromScan(m_lastdz);
+        SurfacePoint point;
+        point.x = m_mcs_x;
+        point.y = m_mcs_y;
+        float compensated = interpolateFromSurfaceScan(point);
 
         QString correction = QString("G90 G1 B%1\n").arg(compensated);
         m_message = correction;
@@ -581,10 +584,10 @@ float Automator::interpolateFromSurfaceScan(const SurfacePoint &point)
     if (rangeY == -1)
         return 1000;
 
-    float z11 = m_surfaceModel->m_surfaceSorted.at(rangeY*mapSizeX+rangeX);
-    float z12 = m_surfaceModel->m_surfaceSorted.at(rangeY*mapSizeX+rangeX+1);
-    float z21 = m_surfaceModel->m_surfaceSorted.at(rangeY*mapSizeX+mapSizeX+rangeX);
-    float z22 = m_surfaceModel->m_surfaceSorted.at(rangeY*mapSizeX+mapSizeX+rangeX+1);
+    float z11 = m_surfaceModel->m_surfaceSorted.at(rangeY*mapSizeX+rangeX).z;
+    float z12 = m_surfaceModel->m_surfaceSorted.at(rangeY*mapSizeX+rangeX+1).z;
+    float z21 = m_surfaceModel->m_surfaceSorted.at(rangeY*mapSizeX+mapSizeX+rangeX).z;
+    float z22 = m_surfaceModel->m_surfaceSorted.at(rangeY*mapSizeX+mapSizeX+rangeX+1).z;
 
 
     float rangeSpanX = x2-x1;
