@@ -13,9 +13,9 @@
 #include "surfacemodel.h"
 #include "gcodeplayer.h"
 
-#include "datatable.h"
-#include "bspline.h"
-#include "bsplinebuilder.h"
+//#include "datatable.h"
+//#include "bspline.h"
+//#include "bsplinebuilder.h"
 
 
 
@@ -31,7 +31,7 @@ class Automator : public QObject
     Q_PROPERTY(float maxPower READ maxPower WRITE setMaxPower)
     Q_PROPERTY(float lastSentPower READ lastSentPower NOTIFY changePower)
     Q_PROPERTY(SurfaceModel *surfaceModel READ surfaceModel CONSTANT)
-    Q_PROPERTY(State state READ state NOTIFY stateChanged);
+    Q_PROPERTY(State state READ state NOTIFY stateChanged)
 public:
     explicit Automator(QObject *parent = nullptr);
     ~Automator();
@@ -134,6 +134,7 @@ private:
     bool m_entryMissing;
     SurfaceModel *m_surfaceModel;
     State m_state;
+    RayReceiver::State m_lastMCState;
 
     //SPLINTER::DataTable m_samples;
     //SPLINTER::BSpline *m_surfaceSpline;

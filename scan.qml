@@ -115,14 +115,6 @@ Window {
 
             onClicked: automator.approveScan()
         }
-
-        Button {
-            text: "Clear scan"
-
-            onClicked: automator.surfaceModel.removeAll()
-        }
-
-
     }
 
     Item {

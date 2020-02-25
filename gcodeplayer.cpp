@@ -247,7 +247,7 @@ void GcodePlayer::processMCResponse(const QString &line)
     if (m_externalRequestForAnswer){
         m_externalRequestForAnswer = false;
         if (line == "ok") {
-            emit answerReceived();
+            emit answerReceived(m_state);
         }
 
     }

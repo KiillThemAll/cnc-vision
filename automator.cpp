@@ -105,25 +105,33 @@ void Automator::onCoordsChanged(float x, float y, float z, float b)
 
 void Automator::onMcStateChanged(RayReceiver::State s)
 {
-    if (!m_working || m_cutModeEnabled)
+    m_lastMCState = s;
+
+    if (!m_working) return;
+
+
+    if (m_cutModeEnabled && s == RayReceiver::Playing) {
+        QTimer::singleShot(1000, this, SLOT(compensateFromScan()));
         return;
-
-    if (s == RayReceiver::Paused) {
-        if(m_mcs_x_check_state != m_mcs_x || m_mcs_y_check_state != m_mcs_y)
-        {
-           m_mcs_x_check_state = m_mcs_x;
-           m_mcs_y_check_state = m_mcs_y;
-           return;
-        }
-
-        if (!m_compensatorOneShot)
-        {
-            QTimer::singleShot(2000, this, SLOT(compensate()));
-            m_compensatorOneShot = true;
-        }
     }
-    if (s == RayReceiver::Playing)
-        m_compensatorOneShot = false;
+    else {
+        if (s == RayReceiver::Paused) {
+            if(m_mcs_x_check_state != m_mcs_x || m_mcs_y_check_state != m_mcs_y)
+            {
+                m_mcs_x_check_state = m_mcs_x;
+                m_mcs_y_check_state = m_mcs_y;
+                return;
+            }
+
+            if (!m_compensatorOneShot)
+            {
+                QTimer::singleShot(2000, this, SLOT(compensate()));
+                m_compensatorOneShot = true;
+            }
+        }
+        if (s == RayReceiver::Playing)
+            m_compensatorOneShot = false;
+    }
 }
 
 void Automator::onCameraFail()
@@ -189,7 +197,16 @@ void Automator::scanFinished(GcodePlayer::State s)
         m_scanComplited = true;
         emit scanStateChanged();
 
-        checkWorkingState();
+        bool working = m_lastdzValid && m_mcConnected && m_lastCoordsValid && m_enabled && m_cameraConnected;
+        if (working) {
+            m_working = true;
+            m_state = m_cutModeEnabled ? AutoCutting : AutoEngraving;
+            emit stateChanged(m_state);
+        } else {
+            m_working = false;
+            m_state = Disabled;
+            emit stateChanged(m_state);
+        }
     }
 }
 
@@ -535,18 +552,23 @@ void Automator::compensateFromScan()
         point.x = m_mcs_x;
         point.y = m_mcs_y;
         float compensated = interpolateFromSurfaceScan(point);
-
-        QString correction = QString("G90 G1 B%1\n").arg(compensated);
-        m_message = correction;
-        emit messageChanged();
-        qDebug() << correction;
-        emit sendToMCWithAnswer(correction);
+        if (compensated > 10) {
+            m_message = "Out of scan range";
+            emit messageChanged();
+            if (m_cutModeEnabled && m_lastMCState == RayReceiver::State::Playing) QTimer::singleShot(1000, this, SLOT(compensateFromScan()));
+        } else {
+            QString correction = QString("G90 G1 B%1\n").arg(compensated);
+            m_message = correction;
+            emit messageChanged();
+            qDebug() << correction;
+            emit sendToMCWithAnswer(correction);
+        }
     }
 }
 
 void Automator::answerFromMCReceived()
 {
-    QTimer::singleShot(1000, this, SLOT(compensateFromScan()));
+    if (m_cutModeEnabled && m_lastMCState == RayReceiver::State::Playing) QTimer::singleShot(1000, this, SLOT(compensateFromScan()));
 }
 
 float Automator::interpolateFromSurfaceScan(const SurfacePoint &point)
@@ -693,6 +715,7 @@ void Automator::scanSurface(int width, int height, int step)
     m_scanWidth = width;
     m_scanHeight = height;
 
+    if (m_scanComplited) m_surfaceModel->removeAll();
     m_surfaceModel->createZeroSurface(width,height,step);
 
     scanSnapshotNumber = 0;
@@ -733,10 +756,6 @@ void Automator::approveScan()
     emit scanStateChanged();
 
     m_scanApprooved = true;
-
-    checkWorkingState();
-
-    QTimer::singleShot(1000, this, SLOT(compensateFromScan()));
 }
 
 void Automator::addMissingEntry(float entry)

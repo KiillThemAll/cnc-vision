@@ -54,7 +54,7 @@ signals:
     void stateChanged(State s);
     void connectionStateChanged();
     void connectionStateChanged(bool connected);
-    void answerReceived();
+    void answerReceived(State s);
 
 
 public slots:

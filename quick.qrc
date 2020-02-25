@@ -3,6 +3,5 @@
         <file>main.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>scan.qml</file>
-        <file>focusentry.qml</file>
     </qresource>
 </RCC>
