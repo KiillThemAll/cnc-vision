@@ -40,8 +40,7 @@ public:
         Disabled,
         AutoEngraving,
         AutoCutting,
-        Scanning,
-        EntryMissing
+        Scanning
     };
     Q_ENUM(State)
 
@@ -91,6 +90,7 @@ signals:
     void continueScan();
     void stateChanged(State s);
     void scanStateChanged();
+    void requestMissingEntry();
 
 public slots:
     void ondzChanged(float dz);
@@ -99,7 +99,7 @@ public slots:
     void onRayConnectionStateChanged(bool connected);
     void onCoordsChanged(float x, float y, float z, float b);
     void onMcStateChanged(RayReceiver::State s);
-    void onCameraStateChanged(CaptureController::Status s);
+    void onCameraFail();
     void compensate();
     void compensateFromScan();
     void scanSnapshot(GcodePlayer::State s);
@@ -131,6 +131,7 @@ private:
     bool m_cutModeEnabled;
     bool m_scanComplited;
     bool m_scanApprooved;
+    bool m_entryMissing;
     SurfaceModel *m_surfaceModel;
     State m_state;
 

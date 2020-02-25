@@ -75,8 +75,8 @@ int main(int argc, char *argv[])
                      &player,       &GcodePlayer::sendWithAnswer);
     QObject::connect(&player,     &GcodePlayer::answerReceived,
                      &automator,    &Automator::answerFromMCReceived);
-    QObject::connect(&captureController,     &CaptureController::statusChanged,
-                     &automator,    &Automator::onCameraStateChanged);
+    QObject::connect(&captureController,     &CaptureController::cameraFail,
+                     &automator,    &Automator::onCameraFail);
     QObject::connect(&automator,     &Automator::startScan,
                      &player,    &GcodePlayer::startFile);
     QObject::connect(&player,     &GcodePlayer::stateChanged,

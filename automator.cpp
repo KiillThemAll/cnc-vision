@@ -29,6 +29,7 @@ Automator::Automator(QObject *parent) : QObject(parent)
 
     m_scanComplited = false;
     m_scanApprooved = false;
+    m_entryMissing = false;
 
     //m_surfaceSpline = nullptr;
 }
@@ -104,8 +105,9 @@ void Automator::onCoordsChanged(float x, float y, float z, float b)
 
 void Automator::onMcStateChanged(RayReceiver::State s)
 {
-    if (!m_working)
+    if (!m_working || m_cutModeEnabled)
         return;
+
     if (s == RayReceiver::Paused) {
         if(m_mcs_x_check_state != m_mcs_x || m_mcs_y_check_state != m_mcs_y)
         {
@@ -124,14 +126,10 @@ void Automator::onMcStateChanged(RayReceiver::State s)
         m_compensatorOneShot = false;
 }
 
-void Automator::onCameraStateChanged(CaptureController::Status s)
+void Automator::onCameraFail()
 {
-    if (s == CaptureController::Status::Stopped)
-    {
-        m_cameraConnected = false;
-        checkWorkingState();
-    }
-
+    m_cameraConnected = false;
+    checkWorkingState();
 }
 
 void Automator::scanSnapshot(GcodePlayer::State s)
@@ -607,6 +605,9 @@ float Automator::interpolateFromSurfaceScan(const SurfacePoint &point)
 
 void Automator::checkWorkingState()
 {
+    if (m_state == Scanning)
+        return;
+
     bool working = m_lastdzValid && m_mcConnected && m_lastCoordsValid && m_enabled && m_cameraConnected;
     if (working) {
         m_working = true;
@@ -625,8 +626,8 @@ void Automator::m_scanSnapshot()
     if (compensated > 10) {
         m_message = "No entry in comp table";
         emit messageChanged();
-        m_state = EntryMissing;
-        emit stateChanged(m_state);
+        m_entryMissing = true;
+        emit requestMissingEntry();
     } else {
         SurfacePoint point;
         point.x = qRound(m_mcs_x-605);
@@ -759,8 +760,9 @@ void Automator::addMissingEntry(float entry)
 
     m_samples.addSample(x,y);*/
 
-    emit continueScan();
+    m_entryMissing = false;
 
+    emit continueScan();
 }
 
 SurfaceModel *Automator::surfaceModel() const

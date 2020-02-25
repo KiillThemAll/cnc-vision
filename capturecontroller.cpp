@@ -42,12 +42,14 @@ void CaptureWorker::doWork()
     while(m_loopRunning) {
         if (!m_capture->grab()) {
             m_captureController->setStatus(CaptureController::Status::EofOrDisconnected);
+            emit cameraFail();
             break;
         }
         m_captureController->m_lock->lockForWrite();
         m_capture->retrieve(m_frame);
         if (m_frame.empty()) { // last frame of video
             m_captureController->setStatus(CaptureController::Status::EofOrDisconnected);
+            emit cameraFail();
             break;
         }
 

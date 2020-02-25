@@ -111,7 +111,7 @@ Window {
 
         Button {
             text: "Approve scan"
-            //enabled: automator.scanComplited
+            enabled: automator.scanComplited
 
             onClicked: automator.approveScan()
         }
@@ -217,8 +217,6 @@ Window {
 
     Connections {
         target: automator
-        onStateChanged: {
-            if (automator.state === Automator.EntryMissing) {entryDialog.open()}
-        }
+        onRequestMissingEntry: {entryDialog.open()}
     }
 }
