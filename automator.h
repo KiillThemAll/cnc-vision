@@ -127,6 +127,8 @@ private:
     float m_lastSentPower;
     QTimer m_powerTimer;
     bool m_compensatorOneShot;
+    bool m_cutCompensatorOneShot;
+    bool m_answerFromMCReceived;
     bool m_scanOneShot;
     bool m_cutModeEnabled;
     bool m_scanComplited;

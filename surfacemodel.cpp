@@ -54,7 +54,7 @@ void SurfaceModel::createZeroSurface(int width, int height, int step)
         for (int j=1; j<surfaceColNum; j++)
             if (i%2)
             {
-                point.x = width-step*j;
+                point.x = (surfaceColNum-1)*step-step*j;
                 point.y = step*i;
                 point.z = 0;
                 m_surface.append(point);
@@ -76,7 +76,9 @@ void SurfaceModel::updatePoint(const SurfacePoint &point, int pos)
     if (pos < 0 || pos > m_surface.count())
         return;
     QModelIndex modelIndex = createIndex(pos, 0);
-    m_surface.replace(pos,point);
+    SurfacePoint temp = m_surface.at(pos);
+    temp.z = point.z;
+    m_surface.replace(pos,temp);
     emit dataChanged(modelIndex, modelIndex);
 }
 

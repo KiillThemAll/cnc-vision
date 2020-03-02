@@ -21,6 +21,8 @@ Automator::Automator(QObject *parent) : QObject(parent)
     m_mcs_x_check_state = 0;
     m_mcs_y_check_state = 0;
     m_compensatorOneShot = false;
+    m_cutCompensatorOneShot = false;
+    m_answerFromMCReceived = true;
     m_scanOneShot = false;
 
     m_surfaceModel = new SurfaceModel(this);
@@ -107,31 +109,33 @@ void Automator::onMcStateChanged(RayReceiver::State s)
 {
     m_lastMCState = s;
 
-    if (!m_working) return;
 
-
-    if (m_cutModeEnabled && s == RayReceiver::Playing) {
-        QTimer::singleShot(1000, this, SLOT(compensateFromScan()));
+    if (m_mcConnected && m_lastCoordsValid && m_enabled && m_cutModeEnabled && s == RayReceiver::Playing) {
+        if (!m_cutCompensatorOneShot && m_answerFromMCReceived) {
+            QTimer::singleShot(1000, this, SLOT(compensateFromScan()));
+            m_cutCompensatorOneShot = true;
+        }
         return;
     }
-    else {
-        if (s == RayReceiver::Paused) {
-            if(m_mcs_x_check_state != m_mcs_x || m_mcs_y_check_state != m_mcs_y)
-            {
-                m_mcs_x_check_state = m_mcs_x;
-                m_mcs_y_check_state = m_mcs_y;
-                return;
-            }
 
-            if (!m_compensatorOneShot)
-            {
-                QTimer::singleShot(2000, this, SLOT(compensate()));
-                m_compensatorOneShot = true;
-            }
+    if (!m_working) return;
+
+    if (!m_cutModeEnabled && s == RayReceiver::Paused) {
+        if(m_mcs_x_check_state != m_mcs_x || m_mcs_y_check_state != m_mcs_y)
+        {
+            m_mcs_x_check_state = m_mcs_x;
+            m_mcs_y_check_state = m_mcs_y;
+            return;
         }
-        if (s == RayReceiver::Playing)
-            m_compensatorOneShot = false;
+
+        if (!m_compensatorOneShot)
+        {
+            QTimer::singleShot(2000, this, SLOT(compensate()));
+            m_compensatorOneShot = true;
+        }
     }
+    if (!m_cutModeEnabled && s == RayReceiver::Playing)
+            m_compensatorOneShot = false;
 }
 
 void Automator::onCameraFail()
@@ -555,20 +559,22 @@ void Automator::compensateFromScan()
         if (compensated > 10) {
             m_message = "Out of scan range";
             emit messageChanged();
-            if (m_cutModeEnabled && m_lastMCState == RayReceiver::State::Playing) QTimer::singleShot(1000, this, SLOT(compensateFromScan()));
+            m_cutCompensatorOneShot = false;
         } else {
             QString correction = QString("G90 G1 B%1\n").arg(compensated);
             m_message = correction;
             emit messageChanged();
             qDebug() << correction;
             emit sendToMCWithAnswer(correction);
+            m_answerFromMCReceived = false;
+            m_cutCompensatorOneShot = false;
         }
     }
 }
 
 void Automator::answerFromMCReceived()
 {
-    if (m_cutModeEnabled && m_lastMCState == RayReceiver::State::Playing) QTimer::singleShot(1000, this, SLOT(compensateFromScan()));
+    m_answerFromMCReceived = true;
 }
 
 float Automator::interpolateFromSurfaceScan(const SurfacePoint &point)
@@ -580,7 +586,7 @@ float Automator::interpolateFromSurfaceScan(const SurfacePoint &point)
     float x2;
     int rangeX = -1;
     for (int i = 0; i < mapSizeX-1; i++) {
-        if (point.x >= m_surfaceModel->m_surfaceSorted.at(i).x && point.x < m_surfaceModel->m_surfaceSorted.at(i+1).x) {
+        if (point.x-605 >= m_surfaceModel->m_surfaceSorted.at(i).x && point.x-605 < m_surfaceModel->m_surfaceSorted.at(i+1).x) {
             x1 = m_surfaceModel->m_surfaceSorted.at(i).x;
             x2 = m_surfaceModel->m_surfaceSorted.at(i+1).x;
             rangeX = i;
@@ -612,7 +618,7 @@ float Automator::interpolateFromSurfaceScan(const SurfacePoint &point)
 
     float rangeSpanX = x2-x1;
     float rangeSpanY = y2-y1;
-    float distX = (point.x - x1) / rangeSpanX;
+    float distX = (point.x-605 - x1) / rangeSpanX;
     float distY = (point.y - y1) / rangeSpanY;
 
     float valueSpanX1 = z12 - z11;
@@ -732,7 +738,7 @@ void Automator::scanSurface(int width, int height, int step)
 
             for (int j=1; j<=width/step; j++)
                 if (i%2)
-                    out << QString("G0 X%1\nM25\n").arg(width-step*j);
+                    out << QString("G0 X%1\nM25\n").arg(width/step*step-step*j);
                 else
                     out << QString("G0 X%1\nM25\n").arg(step*j);
         }

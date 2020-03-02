@@ -147,11 +147,11 @@ Window {
             selectionMode: AbstractGraph3D.SelectionNone
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeft
             axisX.min: 0.0
-            axisX.max: 100.0
+            axisX.max: 1520.0
             axisY.min: -5.0
             axisY.max: 5.0
             axisZ.min: 0.0
-            axisZ.max: 100.0
+            axisZ.max: 1500.0
             axisX.segmentCount: 10
             axisX.subSegmentCount: 2
             axisX.labelFormat: "%i"
