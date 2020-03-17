@@ -26,7 +26,7 @@ Window {
         spacing: 10
         Layout.maximumHeight: 50
         Text {
-            text: "Surface size (X, Y, step)"
+            text: "Surface size (X, Y, step, left shift)"
             color: "gray"
             font.pointSize: 25
         }

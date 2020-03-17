@@ -730,7 +730,7 @@ void Automator::scanSurface(int width, int height, int step, int leftShit)
     if (scanGCode.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(&scanGCode);
 
-        out << "M220 S100\nM204 S600\nG90 G0 X0 Y0 F10000\n";
+        out << QString("M220 S100\nM204 S600\nG90 G0 X%1 Y0 F10000\n").arg(leftShit);
 
         for (int i=0; i<=height/step; i++)
         {
@@ -738,9 +738,9 @@ void Automator::scanSurface(int width, int height, int step, int leftShit)
 
             for (int j=1; j<=width/step; j++)
                 if (i%2)
-                    out << QString("G0 X%1\nM25\n").arg(width/step*step-step*j);
+                    out << QString("G0 X%1\nM25\n").arg(width/step*step-step*j+leftShit);
                 else
-                    out << QString("G0 X%1\nM25\n").arg(step*j);
+                    out << QString("G0 X%1\nM25\n").arg(step*j+leftShit);
         }
 
         out << "G0 X0 Y0\n";

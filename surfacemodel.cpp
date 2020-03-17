@@ -53,14 +53,14 @@ void SurfaceModel::createZeroSurface(int width, int height, int step, int leftSh
         for (int j=1; j<surfaceColNum; j++)
             if (i%2)
             {
-                point.x = (surfaceColNum-1)*step-step*j;
+                point.x = (surfaceColNum-1)*step-step*j+leftShit;
                 point.y = step*i;
                 point.z = 0;
                 m_surface.append(point);
             }
             else
             {
-                point.x = step*j;
+                point.x = step*j+leftShit;
                 point.y = step*i;
                 point.z = 0;
                 m_surface.append(point);
