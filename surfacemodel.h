@@ -29,7 +29,7 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-    void createZeroSurface(int width, int height, int step);
+    void createZeroSurface(int width, int height, int step, int leftShit);
     void updatePoint(const SurfacePoint &point, int pos);
     void updatePoints(const QVector<SurfacePoint> &points);
 

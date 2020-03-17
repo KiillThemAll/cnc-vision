@@ -695,7 +695,7 @@ float Automator::lastSentPower() const
     return m_lastSentPower;
 }
 
-void Automator::scanSurface(int width, int height, int step)
+void Automator::scanSurface(int width, int height, int step, int leftShit)
 {
 
     /*SurfacePoint point;
@@ -718,11 +718,11 @@ void Automator::scanSurface(int width, int height, int step)
                 m_surfaceModel->addPointWithoutNotify(point);
             }
     }*/
-    m_scanWidth = width;
+    m_scanWidth = width-leftShit;
     m_scanHeight = height;
 
     if (m_scanComplited) m_surfaceModel->removeAll();
-    m_surfaceModel->createZeroSurface(width,height,step);
+    m_surfaceModel->createZeroSurface(width,height,step,leftShit);
 
     scanSnapshotNumber = 0;
 

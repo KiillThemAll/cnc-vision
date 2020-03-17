@@ -96,11 +96,32 @@ Window {
             }
         }
 
+        FocusScope {
+            width: 96; height: 30
+            Rectangle {
+                anchors.fill: parent
+                color: "lightsteelblue"
+                border.color: "gray"
+
+            }
+
+            TextInput {
+                id: input4
+                anchors.fill: parent
+                focus: true
+                font.pointSize: 20
+
+                text: "10"
+
+                validator: IntValidator{bottom:0; top:1525}
+            }
+        }
+
 
         Button {
             text: "Scan"
 
-            onClicked: automator.scanSurface(parseInt(input1.text, 10),parseInt(input2.text, 10),parseInt(input3.text, 10))
+            onClicked: automator.scanSurface(parseInt(input1.text, 10),parseInt(input2.text, 10),parseInt(input3.text, 10),parseInt(input3.text, 10))
         }
 
         Text {

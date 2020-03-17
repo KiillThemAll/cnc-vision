@@ -68,7 +68,7 @@ public:
 
     float lastSentPower() const;
 
-    Q_INVOKABLE void scanSurface(int width, int height, int step);
+    Q_INVOKABLE void scanSurface(int width, int height, int step, int leftShit);
     Q_INVOKABLE void approveScan();
     Q_INVOKABLE void addMissingEntry(float entry);
 

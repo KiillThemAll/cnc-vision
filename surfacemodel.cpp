@@ -25,10 +25,9 @@ QVariant SurfaceModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void SurfaceModel::createZeroSurface(int width, int height, int step)
-{
+void SurfaceModel::createZeroSurface(int width, int height, int step, int leftShit) {
     surfaceRowNum = height/step+1;
-    surfaceColNum = width/step+1;
+    surfaceColNum = (width-leftShit)/step+1;
 
     beginInsertRows(QModelIndex(), 0, ((surfaceColNum)*(surfaceRowNum)-1));
 
@@ -38,14 +37,14 @@ void SurfaceModel::createZeroSurface(int width, int height, int step)
     {
         if (i%2)
         {
-            point.x = (surfaceColNum-1)*step;
+            point.x = (surfaceColNum-1)*step+leftShit;
             point.y = step*i;
             point.z = 0;
             m_surface.append(point);
         }
         else
         {
-            point.x = 0;
+            point.x = leftShit;
             point.y = step*i;
             point.z = 0;
             m_surface.append(point);
