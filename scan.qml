@@ -28,7 +28,7 @@ Window {
         Text {
             text: "Surface size (X, Y, step, left shift)"
             color: "gray"
-            font.pointSize: 25
+            font.pointSize: 14
         }
 
         FocusScope {
@@ -46,7 +46,7 @@ Window {
                 focus: true
                 font.pointSize: 20
 
-                text: "100"
+                text: "1510"
 
                 validator: IntValidator{bottom:0; top:1525}
             }
@@ -69,7 +69,7 @@ Window {
                 focus: true
                 font.pointSize: 20
 
-                text: "100"
+                text: "1500"
 
                 validator: IntValidator{bottom:0; top:1525}
             }
@@ -90,7 +90,7 @@ Window {
                 focus: true
                 font.pointSize: 20
 
-                text: "50"
+                text: "70"
 
                 validator: IntValidator{bottom:0; top:1525}
             }
@@ -121,20 +121,26 @@ Window {
         Button {
             text: "Scan"
 
-            onClicked: automator.scanSurface(parseInt(input1.text, 10),parseInt(input2.text, 10),parseInt(input3.text, 10),parseInt(input3.text, 10))
+            onClicked: automator.scanSurface(parseInt(input1.text, 10),parseInt(input2.text, 10),parseInt(input3.text, 10),parseInt(input4.text, 10))
         }
 
         Text {
-            font.pointSize: 20
+            font.pointSize: 16
             text: automator.message
             color: "white"
         }
 
         Button {
-            text: "Approve scan"
+            text: "Approve"
             enabled: automator.scanComplited
 
             onClicked: automator.approveScan()
+        }
+        Button {
+            text: "Load"
+            enabled: automator.scanLoaded
+
+            onClicked: automator.loadLastScan()
         }
     }
 

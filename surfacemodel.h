@@ -3,6 +3,10 @@
 
 #include <QObject>
 #include <QAbstractListModel>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include "gcodeplayeritem.h"
 
 struct SurfacePoint
@@ -40,6 +44,9 @@ public:
     QVector<SurfacePoint> m_surface;
 
     QVector<SurfacePoint> m_surfaceSorted;
+
+    bool saveSurfaceToJsonFile();
+    bool loadSurfaceFromJsonFile();
 
     int surfaceRowNum;
     int surfaceColNum;

@@ -1,5 +1,3 @@
-#include <QQmlEngine>
-
 #include "surfacemodel.h"
 
 SurfaceModel::SurfaceModel(QObject *parent)
@@ -133,4 +131,50 @@ void SurfaceModel::sortPoints()
             else
                 m_surfaceSorted.append(m_surface.at(j+surfaceColNum*i));
     }
+}
+
+bool SurfaceModel::saveSurfaceToJsonFile()
+{
+    QJsonArray surfaceJSONArray;
+
+    QJsonObject tempObject;
+    foreach(const SurfacePoint &temp, m_surface) {
+        tempObject["x"] = temp.x;
+        tempObject["y"] = temp.y;
+        tempObject["z"] = temp.z;
+        surfaceJSONArray.append(tempObject);
+    }
+
+    QFile jsonFile("surface.json");
+    if (!jsonFile.open(QFile::WriteOnly | QFile::Truncate))
+        return 0;
+
+    jsonFile.write(QJsonDocument(surfaceJSONArray).toJson(QJsonDocument::Compact));
+    jsonFile.close();
+    return 1;
+}
+
+bool SurfaceModel::loadSurfaceFromJsonFile()
+{
+    QFile jsonFile("surface.json");
+    if (!jsonFile.open(QFile::ReadOnly))
+        return 0;
+
+    QJsonDocument jsonDocument(QJsonDocument::fromJson(jsonFile.readAll()));
+    QJsonArray surfaceJSONArray = jsonDocument.array();
+
+    QVector<SurfacePoint> gatheredSurface;
+
+    SurfacePoint tempPoint;
+    foreach (const QJsonValue &value, surfaceJSONArray) {
+        QJsonObject obj = value.toObject();
+        tempPoint.x = obj["x"].toDouble();
+        tempPoint.y = obj["y"].toDouble();
+        tempPoint.z = obj["z"].toDouble();
+        gatheredSurface.append(tempPoint);
+    }
+
+    updatePoints(gatheredSurface);
+    sortPoints();
+    return 1;
 }

@@ -244,12 +244,9 @@ void GcodePlayer::sendNextLine()
 
 void GcodePlayer::processMCResponse(const QString &line)
 {
-    if (m_externalRequestForAnswer){
+    if (m_externalRequestForAnswer && line == "ok"){
         m_externalRequestForAnswer = false;
-        if (line == "ok") {
-            emit answerReceived(m_state);
-        }
-
+        emit answerReceived(m_state);
     }
     if (m_querySent) {
         qDebug() << "mc q:" << line;

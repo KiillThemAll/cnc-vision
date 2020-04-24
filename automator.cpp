@@ -200,6 +200,7 @@ void Automator::scanFinished(GcodePlayer::State s)
 
         m_scanComplited = true;
         emit scanStateChanged();
+        m_surfaceModel->saveSurfaceToJsonFile();
 
         bool working = m_lastdzValid && m_mcConnected && m_lastCoordsValid && m_enabled && m_cameraConnected;
         if (working) {
@@ -633,9 +634,16 @@ void Automator::m_scanSnapshot()
     float compensated = compensate(m_lastdz);
     if (compensated > 10) {
         m_message = "No entry in comp table";
-        emit messageChanged();
-        m_entryMissing = true;
-        emit requestMissingEntry();
+        if (!scanSnapshotNumber) {
+            emit messageChanged();
+            m_entryMissing = true;
+            emit requestMissingEntry();
+        } else {
+            m_surfaceModel->updatePoint(m_surfaceModel->m_surface.at(scanSnapshotNumber-1), scanSnapshotNumber);
+            scanSnapshotNumber++;
+            emit continueScan();
+        }
+
     } else {
         SurfacePoint point;
         point.x = qRound(m_mcs_x-605);
@@ -698,8 +706,8 @@ void Automator::scanSurface(int width, int height, int step, int leftShit)
                 m_surfaceModel->addPointWithoutNotify(point);
             }
     }*/
-    m_scanWidth = width-leftShit;
-    m_scanHeight = height;
+    //m_scanWidth = width-leftShit;
+    //m_scanHeight = height;
 
     if (m_scanComplited) m_surfaceModel->removeAll();
     m_surfaceModel->createZeroSurface(width,height,step,leftShit);
@@ -716,9 +724,9 @@ void Automator::scanSurface(int width, int height, int step, int leftShit)
         {
             out << QString("G0 Y%1\nM25\n").arg(step*i);
 
-            for (int j=1; j<=width/step; j++)
+            for (int j=1; j<=(width-leftShit)/step; j++)
                 if (i%2)
-                    out << QString("G0 X%1\nM25\n").arg(width/step*step-step*j+leftShit);
+                    out << QString("G0 X%1\nM25\n").arg((width-leftShit)/step*step-step*j+leftShit);
                 else
                     out << QString("G0 X%1\nM25\n").arg(step*j+leftShit);
         }
@@ -742,6 +750,23 @@ void Automator::approveScan()
     emit scanStateChanged();
 
     m_scanApprooved = true;
+}
+
+void Automator::loadLastScan()
+{
+    if (m_surfaceModel->loadSurfaceFromJsonFile()) {
+        m_message = QString("Scan loaded");
+        emit messageChanged();
+        qDebug() << m_message;
+        m_scanComplited = true;
+        m_scanApprooved = false;
+        emit scanStateChanged();
+    }
+    else {
+        m_message = QString("Scan load fail");
+        emit messageChanged();
+        qDebug() << m_message;
+    }
 }
 
 void Automator::addMissingEntry(float entry)

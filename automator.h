@@ -70,6 +70,7 @@ public:
 
     Q_INVOKABLE void scanSurface(int width, int height, int step, int leftShit);
     Q_INVOKABLE void approveScan();
+    Q_INVOKABLE void loadLastScan();
     Q_INVOKABLE void addMissingEntry(float entry);
 
     SurfaceModel *surfaceModel() const;
@@ -140,8 +141,8 @@ private:
 
     //SPLINTER::DataTable m_samples;
     //SPLINTER::BSpline *m_surfaceSpline;
-    float m_scanWidth;
-    float m_scanHeight;
+    //float m_scanWidth;
+    //float m_scanHeight;
     int scanSnapshotNumber;
 
 private slots:
