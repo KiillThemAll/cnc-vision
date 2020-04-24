@@ -72,6 +72,7 @@ public slots:
 signals:
     void statusChanged(Status s);
     void frameReady();
+    void cameraFail();
     //void statisticsReady(QVariant ?
 
 private:

@@ -26,7 +26,7 @@ void CaptureWorker::doWork()
     if (ok) {
         m_capture = new cv::VideoCapture(deviceId);
     } else {
-        m_capture = new cv::VideoCapture("http://192.168.88.254:8080/?action=stream");
+        m_capture = new cv::VideoCapture("http://192.168.88.239:8080/?action=stream");
     }
     if (!m_capture->isOpened()) {
         qWarning() << "Can't capture" << m_device;
@@ -167,5 +167,9 @@ void CaptureController::setStatus(CaptureController::Status status)
         return;
     m_status = status;
     emit statusChanged(status);
+    if (status == Status::EofOrDisconnected)
+        emit cameraFail();
+    if (status == Status::Stopped)
+        emit cameraFail();
 }
 

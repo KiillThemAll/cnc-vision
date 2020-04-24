@@ -21,6 +21,7 @@ public:
         Stopped,
         Playing,
         Paused,
+        PausedM25,
         Error
     };
     Q_ENUM(State)
@@ -50,9 +51,10 @@ public:
 signals:
     void currentLineChanged();
     void linesCountChanged();
-    void stateChanged();
+    void stateChanged(State s);
     void connectionStateChanged();
     void connectionStateChanged(bool connected);
+    void answerReceived(State s);
 
 
 public slots:
@@ -61,6 +63,11 @@ public slots:
     void pause();
     void stop();
     void send(const QString &command);
+    void startFile(const QUrl &fileUrl);
+    void continueFromM25();
+    void sendWithAnswer(const QString &command);
+
+
 
 private slots:
     void onSocketStateChanged(QAbstractSocket::SocketState state);
@@ -79,6 +86,7 @@ private:
     QTcpSocket *m_tcp;
     QString m_tcpLine;
     bool m_querySent;
+    bool m_externalRequestForAnswer;
 };
 
 #endif // GCODEPLAYER_H

@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
     RayReceiver receiver;
     engine.rootContext()->setContextProperty("ray", &receiver);
 
+    qmlRegisterType<GcodePlayer>("tech.vhrd.automator", 1, 0, "Automator");
+
     Automator automator;
     engine.rootContext()->setContextProperty("automator", &automator);
     QObject::connect(&lineDetector, QOverload<float>::of(&LineDetector::dzChanged),
@@ -69,8 +71,20 @@ int main(int argc, char *argv[])
                      &receiver,     &RayReceiver::setLaserPower);
     QObject::connect(&automator,    &Automator::sendToMC,
                      &player,       &GcodePlayer::send);
-    QObject::connect(&captureController,     &CaptureController::statusChanged,
-                     &automator,    &Automator::onCameraStateChanged);
+    QObject::connect(&automator,    &Automator::sendToMCWithAnswer,
+                     &player,       &GcodePlayer::sendWithAnswer);
+    QObject::connect(&player,     &GcodePlayer::answerReceived,
+                     &automator,    &Automator::answerFromMCReceived);
+    QObject::connect(&captureController,     &CaptureController::cameraFail,
+                     &automator,    &Automator::onCameraFail);
+    QObject::connect(&automator,     &Automator::startScan,
+                     &player,    &GcodePlayer::startFile);
+    QObject::connect(&player,     &GcodePlayer::stateChanged,
+                     &automator,    &Automator::scanSnapshot);
+    QObject::connect(&automator,     &Automator::continueScan,
+                     &player,    &GcodePlayer::continueFromM25);
+    QObject::connect(&player,     &GcodePlayer::stateChanged,
+                     &automator,    &Automator::scanFinished);
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

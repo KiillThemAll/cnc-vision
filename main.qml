@@ -1,15 +1,17 @@
 import QtQuick 2.10
 import QtQuick.Window 2.10
-import QtQuick.Controls 2.12
-import QtQuick.Layouts 1.12
+import QtQuick.Controls 2.3
+import QtQuick.Layouts 1.3
 import QtMultimedia 5.9
 import io.opencv 1.0
 import tech.vhrd.vision 1.0
 import tech.vhrd 1.0
-import QtCharts 2.3
+import tech.vhrd.automator 1.0
+import QtCharts 2.2
 import QtQuick.Dialogs 1.2
 
 Window {
+    id: root
     visible: true
     width: 1920
     height: 1080
@@ -141,7 +143,7 @@ Window {
                     from: 0
                     to: 255
                     stepSize: 1
-                    first.value: 225
+                    first.value: 185
                     second.value: 255
                     first.onMoved: lineDetector.valueFrom = Math.floor(first.value)
                     second.onMoved: lineDetector.valueTo = Math.floor(second.value)
@@ -186,7 +188,7 @@ Window {
                     from: 0
                     to: 1
                     stepSize: 0.01
-                    value: 0.06
+                    value: 0.045
                     onValueChanged: lineDetector.threshold = value
                     Component.onCompleted: {
                         lineDetector.threshold = value
@@ -451,7 +453,10 @@ Window {
                         } else if (lstate === GcodePlayer.Paused) {
                             playerStatusLabel.text = "PAUSED"
                             playerStatusLabel.color = "#cddc39"
-                        } else if (lstate === GcodePlayer.Stopped) {
+                        } else if (lstate === GcodePlayer.PausedM25) {
+                            playerStatusLabel.text = "PAUSEDM25"
+                            playerStatusLabel.color = "#cddc39"
+                        }else if (lstate === GcodePlayer.Stopped) {
                             playerStatusLabel.text = "STOPPED"
                             playerStatusLabel.color = "orange"
                         } else if (lstate === GcodePlayer.Error) {
@@ -550,12 +555,14 @@ Window {
             }
 
             ScrollBar.vertical: ScrollBar {
-                minimumSize: 0.1
+                //minimumSize: 0.1
             }
         }
     }
 
     Item {
+
+
         anchors.top: parent.top
         anchors.left: buttonsLayout.right
         anchors.bottom: playerItem.top
@@ -648,11 +655,43 @@ Window {
                     onCheckedChanged: automator.enabled = checked
                 }
 
+                Button {
+                    text: "Scan"
+                    onClicked: {
+                            var component = Qt.createComponent("scan.qml");
+                            component.createObject(root);
+
+                        }
+                }
+
                 Text {
                     id: automatorWorkingLabel
                     font.bold: true
-                    text: automator.working ? "working" : "stopped"
-                    color: automator.working ? "green" : "red"
+                    text: "DISABLED"
+                    color: "red"
+
+                    Connections {
+                        target: automator
+                        onStateChanged: {
+                            var astate = automator.state;
+                            if (astate === Automator.Disabled) {
+                                automatorWorkingLabel.text = "DISABLED"
+                                automatorWorkingLabel.color = "#4caf50"
+                            } else if (astate === Automator.AutoEngraving) {
+                                automatorWorkingLabel.text = "ENGRAVING"
+                                automatorWorkingLabel.color = "#cddc39"
+                            } else if (astate === Automator.AutoCutting) {
+                                automatorWorkingLabel.text = "CUTTING"
+                                automatorWorkingLabel.color = "#cddc39"
+                            }else if (astate === Automator.Scanning) {
+                                automatorWorkingLabel.text = "SCANNING"
+                                automatorWorkingLabel.color = "orange"
+                            } else if (astate === Automator.EntryMissing) {
+                                automatorWorkingLabel.text = "ENTRY MISSING"
+                                automatorWorkingLabel.color = "#f44336"
+                            }
+                        }
+                    }
                 }
 
                 Text {
@@ -742,11 +781,11 @@ Window {
                 Text {
                     color: "#ccc"
                     font.bold: true
-                    text: "Auto B:"
+                    text: "AutoEngr/AutoCut:"
                 }
 
                 Switch {
-                    onCheckedChanged: automator.autosendB = checked
+                    onCheckedChanged: automator.cutModeEnabled = checked
                 }
 
                 Text {
