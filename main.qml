@@ -78,8 +78,8 @@ Window {
                     stepSize: 1
                     first.value: 0
                     second.value: 40
-                    //first.onMoved: lineDetector.hueLowRangeFrom = Math.floor(first.value)
-                    //second.onMoved: lineDetector.hueLowRangeTo = Math.floor(second.value)
+                    first.onMoved: lineDetector.hueLowRangeFrom = Math.floor(first.value)
+                    second.onMoved: lineDetector.hueLowRangeTo = Math.floor(second.value)
                     Component.onCompleted: {
                         lineDetector.hueLowRangeFrom = Math.floor(first.value);
                         lineDetector.hueLowRangeTo = Math.floor(second.value);
@@ -101,8 +101,8 @@ Window {
                     stepSize: 1
                     first.value: 140
                     second.value: 179
-                    //first.onMoved: lineDetector.hueHighRangeFrom = Math.floor(first.value)
-                    //second.onMoved: lineDetector.hueHighRangeTo = Math.floor(second.value)
+                    first.onMoved: lineDetector.hueHighRangeFrom = Math.floor(first.value)
+                    second.onMoved: lineDetector.hueHighRangeTo = Math.floor(second.value)
                     Component.onCompleted: {
                         lineDetector.hueHighRangeFrom = Math.floor(first.value);
                         lineDetector.hueHighRangeTo = Math.floor(second.value);
@@ -123,8 +123,8 @@ Window {
                     stepSize: 1
                     first.value: 0
                     second.value: 160
-                    //first.onMoved: lineDetector.saturationFrom = Math.floor(first.value)
-                    //second.onMoved: lineDetector.saturationTo = Math.floor(second.value)
+                    first.onMoved: lineDetector.saturationFrom = Math.floor(first.value)
+                    second.onMoved: lineDetector.saturationTo = Math.floor(second.value)
                     Component.onCompleted: {
                         lineDetector.saturationFrom = Math.floor(first.value);
                         lineDetector.saturationTo = Math.floor(second.value);
@@ -143,10 +143,10 @@ Window {
                     from: 0
                     to: 255
                     stepSize: 1
-                    first.value: 225
+                    first.value: 185
                     second.value: 255
-                    //first.onMoved: lineDetector.valueFrom = Math.floor(first.value)
-                    //second.onMoved: lineDetector.valueTo = Math.floor(second.value)
+                    first.onMoved: lineDetector.valueFrom = Math.floor(first.value)
+                    second.onMoved: lineDetector.valueTo = Math.floor(second.value)
                     Component.onCompleted: {
                         lineDetector.valueFrom = Math.floor(first.value);
                         lineDetector.valueTo = Math.floor(second.value);
@@ -167,8 +167,8 @@ Window {
                     stepSize: 0.01
                     first.value: 0.18
                     second.value: 0.28
-                    //first.onMoved: lineDetector.integrateFrom = first.value
-                    //second.onMoved: lineDetector.integrateTo = second.value
+                    first.onMoved: lineDetector.integrateFrom = first.value
+                    second.onMoved: lineDetector.integrateTo = second.value
                     Component.onCompleted: {
                         lineDetector.integrateFrom = first.value;
                         lineDetector.integrateTo = second.value;
@@ -188,7 +188,7 @@ Window {
                     from: 0
                     to: 1
                     stepSize: 0.01
-                    value: 0.06
+                    value: 0.045
                     onValueChanged: lineDetector.threshold = value
                     Component.onCompleted: {
                         lineDetector.threshold = value
