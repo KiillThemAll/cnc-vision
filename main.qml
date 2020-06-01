@@ -122,7 +122,7 @@ Window {
                     to: 255
                     stepSize: 1
                     first.value: 0
-                    second.value: 160
+                    second.value: 100
                     first.onMoved: lineDetector.saturationFrom = Math.floor(first.value)
                     second.onMoved: lineDetector.saturationTo = Math.floor(second.value)
                     Component.onCompleted: {
