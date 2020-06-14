@@ -638,7 +638,8 @@ float Automator::compensate(float dz) const
                          5.2,	-3.92352567028875,
                          5.1,	-3.9434465252707,
                          5,	-3.96341123727313,
-                         4.9,	-3.98341990316235
+                         4.9,	-3.98341990316235,
+                         4.1,   -4
                         };
     const int mapSize = sizeof(map) / sizeof(map[0]);
     int range = -1;

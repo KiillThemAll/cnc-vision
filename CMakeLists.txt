@@ -23,14 +23,26 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
-message(STATUS "CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
-message(STATUS "CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
-message(STATUS "CMAKE_CURRENT_BINARY_DIR = ${CMAKE_CURRENT_BINARY_DIR}")
+#message(STATUS "CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
+#message(STATUS "CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
+#message(STATUS "CMAKE_CURRENT_BINARY_DIR = ${CMAKE_CURRENT_BINARY_DIR}")
 
 if(CNCVISION)
     set(CMAKE_SYSROOT /home/woodenprint/tinker/sysroot)
-    set(OpenCV_DIR /home/woodenprint/tinker/sysroot/usr/lib/arm-linux-gnueabihf/cmake/opencv4/)
-    link_directories(/home/woodenprint/tinker/sysroot/usr/local/lib)
+    #set(MYSYSROOT /home/woodenprint/tinker/sysroot)
+    set(OpenCV_DIR /home/woodenprint/tinker/sysroot/usr/local/lib/cmake/opencv4)
+    #link_directories(/home/woodenprint/tinker/sysroot/lib)
+
+    #SET( CMAKE_EXE_LINKER_FLAGS   "-L/home/woodenprint/tinker/sysroot/lib/arm-linux-gnueabihf")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
+
+    #set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+
+    #set(CMAKE_INSTALL_RPATH "/usr/lib/arm-linux-gnueabihf")
+
+    #set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
+
+    #set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
     set(CMAKE_INSTALL_PREFIX "/home/linaro/cnc-vision")
 
