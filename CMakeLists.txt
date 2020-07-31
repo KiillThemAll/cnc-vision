@@ -64,7 +64,7 @@ if(ANDROIDGUI)
 endif()
 
 find_package(Qt5 COMPONENTS Core Quick Qml Multimedia Charts REQUIRED)
-#find_package(OpenCV REQUIRED)
+find_package(OpenCV REQUIRED)
 
 #message(STATUS "OpenCV_INCLUDE_DIRS = ${OpenCV_INCLUDE_DIRS}")
 #message(STATUS "OpenCV_LIBS = ${OpenCV_LIBS}")
